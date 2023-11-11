@@ -7,7 +7,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Engine", "Engine\Engine.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Raylib-cs", "Engine\Core\Framework\Raylib-cs 4.2.0\Raylib-cs.csproj", "{E5D4B50D-21DE-40B0-BEAF-51B501879228}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orbit", "Orbit\Orbit.csproj", "{FA01AA64-E2F0-43AD-8A54-46AF7357E2D1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Orbit", "Orbit\Orbit.csproj", "{FA01AA64-E2F0-43AD-8A54-46AF7357E2D1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5F8EF598-7929-4B74-8A03-0ADEE3530A3B} = {5F8EF598-7929-4B74-8A03-0ADEE3530A3B}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "rEngine API", "rEngine API", "{D0D7B9C9-A0BA-450B-A4F9-EF28508D6C6E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Trex_Runner_clone", "Trex_Runner_clone\Trex_Runner_clone.csproj", "{0432E68C-D0E6-4BF2-BB97-9032A52659C2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5F8EF598-7929-4B74-8A03-0ADEE3530A3B} = {5F8EF598-7929-4B74-8A03-0ADEE3530A3B}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.VelcroPhysic2D", "Engine.VelcroPhysic2D\Engine.VelcroPhysic2D.csproj", "{A9583536-9DE7-4A0D-8889-06D69DFE2359}"
 	ProjectSection(ProjectDependencies) = postProject
 		{5F8EF598-7929-4B74-8A03-0ADEE3530A3B} = {5F8EF598-7929-4B74-8A03-0ADEE3530A3B}
 	EndProjectSection
@@ -30,9 +42,22 @@ Global
 		{FA01AA64-E2F0-43AD-8A54-46AF7357E2D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA01AA64-E2F0-43AD-8A54-46AF7357E2D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA01AA64-E2F0-43AD-8A54-46AF7357E2D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0432E68C-D0E6-4BF2-BB97-9032A52659C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0432E68C-D0E6-4BF2-BB97-9032A52659C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0432E68C-D0E6-4BF2-BB97-9032A52659C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0432E68C-D0E6-4BF2-BB97-9032A52659C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9583536-9DE7-4A0D-8889-06D69DFE2359}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9583536-9DE7-4A0D-8889-06D69DFE2359}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9583536-9DE7-4A0D-8889-06D69DFE2359}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9583536-9DE7-4A0D-8889-06D69DFE2359}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5F8EF598-7929-4B74-8A03-0ADEE3530A3B} = {D0D7B9C9-A0BA-450B-A4F9-EF28508D6C6E}
+		{E5D4B50D-21DE-40B0-BEAF-51B501879228} = {D0D7B9C9-A0BA-450B-A4F9-EF28508D6C6E}
+		{A9583536-9DE7-4A0D-8889-06D69DFE2359} = {D0D7B9C9-A0BA-450B-A4F9-EF28508D6C6E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5F8F64B6-3832-4E94-8B1E-4C220B96F093}

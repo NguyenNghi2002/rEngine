@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="CactusManager.cs" />
+    <Compile Include="GameScene.cs" />
+    <Compile Include="JumpController.cs" />
+    <Compile Include="JumperManager.cs" />
+    <Compile Include="Obstacle.cs" />
+    <Compile Include="TrexRunner.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="bin\Debug\net6.0\Trex\100-offline-sprite.png" />
+    <Content Include="bin\Debug\net6.0\Trex\100-offline-sprite.xml" />
+    <Content Include="bin\Debug\net6.0\Trex\asset\cloud.png" />
+    <Content Include="bin\Debug\net6.0\Trex\asset\dinasour.png" />
+    <Content Include="bin\Debug\net6.0\Trex\asset\ground.png" />
+    <Content Include="bin\Debug\net6.0\Trex\asset\icon.png" />
+    <Content Include="bin\Debug\net6.0\Trex\asset\reset-button.png" />
+    <Content Include="bin\Debug\net6.0\Trex\asset\small-cactus.png" />
+    <Content Include="bin\Debug\net6.0\Trex\asset\tilemap_template%2816x16%29.png" />
+    <Content Include="bin\Debug\net6.0\Trex\button-press.mp3" />
+    <Content Include="bin\Debug\net6.0\Trex\hit.mp3" />
+    <Content Include="bin\Debug\net6.0\Trex\score-reached.mp3" />
+    <Content Include="bin\Debug\net6.0\Trex\sprite.png" />
+    <Content Include="bin\Debug\net6.0\Trex\sprite.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="bin\Debug\net6.0\raylib.dll" />
+    <None Include="bin\Debug\net6.0\Trex\asset\arena.aseprite" />
+    <None Include="bin\Debug\net6.0\Trex\asset\box.aseprite" />
+    <None Include="bin\Debug\net6.0\Trex\asset\dinasour.aseprite" />
+    <None Include="bin\Debug\net6.0\Trex\asset\dreamy world.aseprite" />
+    <None Include="bin\Debug\net6.0\Trex\asset\ground.aseprite" />
+    <None Include="bin\Debug\net6.0\Trex\asset\ReUndo.aseprite" />
+    <None Include="bin\Debug\net6.0\Trex\asset\Sprite-0001.aseprite" />
+    <None Include="bin\Debug\net6.0\Trex\asset\tilemap.aseprite" />
+    <None Include="bin\Debug\net6.0\Trex\asset\tilemap_template.aseprite" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Engine\Engine.csproj" />
+  </ItemGroup>
+
+</Project>
