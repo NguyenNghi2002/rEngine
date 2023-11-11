@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "dgSpecHash": "GopJCxoC3MMbM0mwkIC+d7Q1ndIbAratt7nyA64TUt9kMpPfm6cb/R8LJe2hpHCjK2ffQc8hmY67UH9pfZ0KBA==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\nghin\\source\\repos\\Raylib_Engine\\Engine\\Engine.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\nghin\\.nuget\\packages\\imgui.net\\1.89.4\\imgui.net.1.89.4.nupkg.sha512",
+    "C:\\Users\\nghin\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512",
+    "C:\\Users\\nghin\\.nuget\\packages\\system.buffers\\4.4.0\\system.buffers.4.4.0.nupkg.sha512",
+    "C:\\Users\\nghin\\.nuget\\packages\\system.numerics.vectors\\4.5.0\\system.numerics.vectors.4.5.0.nupkg.sha512",
+    "C:\\Users\\nghin\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\4.4.0\\system.runtime.compilerservices.unsafe.4.4.0.nupkg.sha512",
+    "C:\\Users\\nghin\\.nuget\\packages\\raylib-cs\\4.2.0.1\\raylib-cs.4.2.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}
