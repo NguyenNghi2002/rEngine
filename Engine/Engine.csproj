@@ -1,0 +1,191 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="Core\Framework\**" />
+    <None Remove="Core\Framework\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Core\Base\Core.cs" />
+    <Compile Include="Core\Base\Debug.cs" />
+    <Compile Include="Core\Base\Interface\IDrawable.cs" />
+    <Compile Include="Core\Base\Interface\IFinalRender.cs" />
+    <Compile Include="Core\Base\Interface\IRenderable.cs" />
+    <Compile Include="Core\Base\Interface\IUpdatable.cs" />
+    <Compile Include="Core\Base\Renderer.cs" />
+    <Compile Include="Core\Base\Scene.cs" />
+    <Compile Include="Core\Base\SceneAPI.cs" />
+    <Compile Include="Core\Base\SceneComponent.cs" />
+    <Compile Include="Core\Base\SceneLifecycles.cs" />
+    <Compile Include="Core\Base\Transition.cs" />
+    <Compile Include="Core\Contents\Resource.cs" />
+    <Compile Include="Core\Contents\rFont.cs" />
+    <Compile Include="Core\Contents\rRenderTexture.cs" />
+    <Compile Include="Core\Contents\rShader.cs" />
+    <Compile Include="Core\Contents\rSound.cs" />
+    <Compile Include="Core\Contents\rTextPack\Core.cs" />
+    <Compile Include="Core\Contents\rTextPack\Sprite.cs" />
+    <Compile Include="Core\Contents\rTextPack\TextureAtlas.cs" />
+    <Compile Include="Core\Contents\rTexture.cs" />
+    <Compile Include="Core\EC\Collection\ComponentCollection.cs" />
+    <Compile Include="Core\EC\Collection\EntityList.cs" />
+    <Compile Include="Core\EC\Component.cs" />
+    <Compile Include="Core\EC\DrawableComponent.cs" />
+    <Compile Include="Core\EC\Entity.cs" />
+    <Compile Include="Core\EC\Transform.cs" />
+    <Compile Include="Core\Loader\DefaultLoaders.cs" />
+    <Compile Include="Core\Loader\ILoader.cs" />
+    <Compile Include="Core\Managers\ContentManager.cs" />
+    <Compile Include="Core\Managers\CoroutineManager.cs" />
+    <Compile Include="Core\Managers\GlobalManager.cs" />
+    <Compile Include="Core\Managers\TimerManager.cs" />
+    <Compile Include="Core\Renderers\DefaultRenderer2D.cs" />
+    <Compile Include="Core\Renderers\DefaultRenderer3D.cs" />
+    <Compile Include="Easings.cs" />
+    <Compile Include="EntityManager.cs" />
+    <Compile Include="External\TiledSharp\RayTiledRendering.cs" />
+    <Compile Include="External\TiledSharp\src\AssemblyInfo.cs" />
+    <Compile Include="External\TiledSharp\src\Group.cs" />
+    <Compile Include="External\TiledSharp\src\ImageLayer.cs" />
+    <Compile Include="External\TiledSharp\src\ITmxLayer.cs" />
+    <Compile Include="External\TiledSharp\src\Layer.cs" />
+    <Compile Include="External\TiledSharp\src\Map.cs" />
+    <Compile Include="External\TiledSharp\src\ObjectGroup.cs" />
+    <Compile Include="External\TiledSharp\src\TiledCore.cs" />
+    <Compile Include="External\TiledSharp\src\Tileset.cs" />
+    <Compile Include="External\TiledSharp\TiledExtension.cs" />
+    <Compile Include="obj\Debug\net6.0\.NETCoreApp,Version=v6.0.AssemblyAttributes.cs" />
+    <Compile Include="obj\Debug\net6.0\Engine.AssemblyInfo.cs" />
+    <Compile Include="obj\Debug\net6.0\Engine.GlobalUsings.g.cs" />
+    <Compile Include="Pathfinding\AStar\AstarGridGraph.cs" />
+    <Compile Include="Pathfinding\AStar\AStarPathfinder.cs" />
+    <Compile Include="Pathfinding\AStar\IAstarGraph.cs" />
+    <Compile Include="Pathfinding\BreadthFirst\BreadthFirstPathfinder.cs" />
+    <Compile Include="Pathfinding\BreadthFirst\IUnweightedGraph.cs" />
+    <Compile Include="Pathfinding\BreadthFirst\UnweightedGraph.cs" />
+    <Compile Include="Pathfinding\BreadthFirst\UnweightedGridGraph.cs" />
+    <Compile Include="Pathfinding\Dijkstra\IWeightedGraph.cs" />
+    <Compile Include="Pathfinding\Dijkstra\WeightedGridGraph.cs" />
+    <Compile Include="Pathfinding\Dijkstra\WeightedPathfinder.cs" />
+    <Compile Include="rlImgui.cs" />
+    <Compile Include="Sample\Components\FollowCursor.cs" />
+    <Compile Include="Sample\Components\Primitive2DRenderer.cs" />
+    <Compile Include="Sample\Components\RenderableComponent.cs" />
+    <Compile Include="Sample\Components\SpatialHash.cs" />
+    <Compile Include="Sample\Components\SpriteRenderer.cs" />
+    <Compile Include="Sample\Components\UICanvas.cs" />
+    <Compile Include="Sample\Script\TiledMap.cs" />
+    <Compile Include="Sample\Transition\FadeTransition.cs" />
+    <Compile Include="UI\ArraySelection.cs" />
+    <Compile Include="UI\Base\Align.cs" />
+    <Compile Include="UI\Base\Cell.cs" />
+    <Compile Include="UI\Base\DebugRectangleF.cs" />
+    <Compile Include="UI\Base\Direction.cs" />
+    <Compile Include="UI\Base\Element.cs" />
+    <Compile Include="UI\Base\Group.cs" />
+    <Compile Include="UI\Base\ICullable.cs" />
+    <Compile Include="UI\Base\IGamepadFocusable.cs" />
+    <Compile Include="UI\Base\IInputListener.cs" />
+    <Compile Include="UI\Base\IKeyboardListener.cs" />
+    <Compile Include="UI\Base\ILayout.cs" />
+    <Compile Include="UI\Base\Scaling.cs" />
+    <Compile Include="UI\Base\Touchable.cs" />
+    <Compile Include="UI\Base\Value.cs" />
+    <Compile Include="UI\Containers\Container.cs" />
+    <Compile Include="UI\Containers\HorizontalGroup.cs" />
+    <Compile Include="UI\Containers\ScrollPane.cs" />
+    <Compile Include="UI\Containers\SplitPane.cs" />
+    <Compile Include="UI\Containers\Stack.cs" />
+    <Compile Include="UI\Containers\Table.cs" />
+    <Compile Include="UI\Drawable\ButtonDrawable.cs" />
+    <Compile Include="UI\Drawable\PrimitiveDrawable.cs" />
+    <Compile Include="UI\Drawable\SpriteDrawable.cs" />
+    <Compile Include="UI\Extra\ColorExt.cs" />
+    <Compile Include="UI\Extra\MatrixEx.cs" />
+    <Compile Include="UI\IDrawable.cs" />
+    <Compile Include="UI\Padding.cs" />
+    <Compile Include="UI\Selection.cs" />
+    <Compile Include="UI\Skin.cs" />
+    <Compile Include="UI\Stage.cs" />
+    <Compile Include="UI\TooltipManager.cs" />
+    <Compile Include="UI\UIDefault.cs" />
+    <Compile Include="UI\Widget\Button.cs" />
+    <Compile Include="UI\Widget\ButtonGroup.cs" />
+    <Compile Include="UI\Widget\CheckBox.cs" />
+    <Compile Include="UI\Widget\Dialog.cs" />
+    <Compile Include="UI\Widget\IconButton.cs" />
+    <Compile Include="UI\Widget\Image.cs" />
+    <Compile Include="UI\Widget\ImageButton.cs" />
+    <Compile Include="UI\Widget\Label.cs" />
+    <Compile Include="UI\Widget\ListBox.cs" />
+    <Compile Include="UI\Widget\ProgressBar.cs" />
+    <Compile Include="UI\Widget\SelectBox.cs" />
+    <Compile Include="UI\Widget\SelectBoxList.cs" />
+    <Compile Include="UI\Widget\Slider.cs" />
+    <Compile Include="UI\Widget\TextButton.cs" />
+    <Compile Include="UI\Widget\TextField.cs" />
+    <Compile Include="UI\Widget\TextTooltip.cs" />
+    <Compile Include="UI\Widget\Tooltip.cs" />
+    <Compile Include="UI\Widget\Window.cs" />
+    <Compile Include="Utilities\Collections\FastList.cs" />
+    <Compile Include="Utilities\Collections\ListPool.cs" />
+    <Compile Include="Utilities\Collections\Map.cs" />
+    <Compile Include="Utilities\Collections\Pool.cs" />
+    <Compile Include="Utilities\Extension\ComponentExt.cs" />
+    <Compile Include="Utilities\Extension\RectangleExt.cs" />
+    <Compile Include="Utilities\Extension\SystemVector2Ext.cs" />
+    <Compile Include="Utilities\Extension\TransformatonExt.cs" />
+    <Compile Include="Utilities\Input.cs" />
+    <Compile Include="Utilities\InputUtils.cs" />
+    <Compile Include="Utilities\Insist.cs" />
+    <Compile Include="Utilities\ListExt.cs" />
+    <Compile Include="Utilities\Ray\Camera2DExt.cs" />
+    <Compile Include="Utilities\Ray\RaymathF.cs" />
+    <Compile Include="Utilities\Ray\RayUtils.cs" />
+    <Compile Include="Utilities\Ray\TextureExt.cs" />
+    <Compile Include="Utilities\ReflectUtils.cs" />
+    <Compile Include="Utilities\Time.cs" />
+    <Compile Include="Utilities\User32.cs" />
+    <Compile Include="Utilities\Varibles\VectorInt2.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="obj\Debug\net6.0\Engine.csproj.FileListAbsolute.txt" />
+    <Content Include="obj\Engine.csproj.nuget.dgspec.json" />
+    <Content Include="obj\project.assets.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ImGui.NET" Version="1.89.4" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="Core\Framework\Raylib-cs 4.2.0\Raylib-cs.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="bin\Debug\net6.0\" />
+    <Folder Include="obj\Debug\net6.0\refint\" />
+    <Folder Include="obj\Debug\net6.0\ref\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="obj\Debug\net6.0\Engine.AssemblyInfoInputs.cache" />
+    <None Include="obj\Debug\net6.0\Engine.assets.cache" />
+    <None Include="obj\Debug\net6.0\Engine.csproj.AssemblyReference.cache" />
+    <None Include="obj\Debug\net6.0\Engine.csproj.CoreCompileInputs.cache" />
+    <None Include="obj\Debug\net6.0\Engine.GeneratedMSBuildEditorConfig.editorconfig" />
+    <None Include="obj\Engine.csproj.nuget.g.props" />
+    <None Include="obj\Engine.csproj.nuget.g.targets" />
+    <None Include="obj\project.nuget.cache" />
+  </ItemGroup>
+
+</Project>
