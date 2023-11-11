@@ -157,6 +157,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="bin\Debug\net6.0\Engine.deps.json" />
+    <Content Include="bin\Debug\net6.0\Raylib-cs.xml" />
     <Content Include="obj\Debug\net6.0\Engine.csproj.FileListAbsolute.txt" />
     <Content Include="obj\Engine.csproj.nuget.dgspec.json" />
     <Content Include="obj\project.assets.json" />
@@ -172,17 +174,26 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="bin\Debug\net6.0\" />
-    <Folder Include="obj\Debug\net6.0\refint\" />
-    <Folder Include="obj\Debug\net6.0\ref\" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <None Include="bin\Debug\net6.0\Engine.dll" />
+    <None Include="bin\Debug\net6.0\Engine.pdb" />
+    <None Include="bin\Debug\net6.0\Raylib-cs.dll" />
+    <None Include="bin\Debug\net6.0\Raylib-cs.pdb" />
+    <None Include="bin\Debug\net6.0\runtimes\linux-x64\native\.keep" />
+    <None Include="bin\Debug\net6.0\runtimes\osx-arm64\native\.keep" />
+    <None Include="bin\Debug\net6.0\runtimes\osx-x64\native\.keep" />
+    <None Include="bin\Debug\net6.0\runtimes\win-x64\native\.keep" />
+    <None Include="bin\Debug\net6.0\runtimes\win-x86\native\.keep" />
     <None Include="obj\Debug\net6.0\Engine.AssemblyInfoInputs.cache" />
     <None Include="obj\Debug\net6.0\Engine.assets.cache" />
     <None Include="obj\Debug\net6.0\Engine.csproj.AssemblyReference.cache" />
+    <None Include="obj\Debug\net6.0\Engine.csproj.BuildWithSkipAnalyzers" />
+    <None Include="obj\Debug\net6.0\Engine.csproj.CopyComplete" />
     <None Include="obj\Debug\net6.0\Engine.csproj.CoreCompileInputs.cache" />
+    <None Include="obj\Debug\net6.0\Engine.dll" />
     <None Include="obj\Debug\net6.0\Engine.GeneratedMSBuildEditorConfig.editorconfig" />
+    <None Include="obj\Debug\net6.0\Engine.pdb" />
+    <None Include="obj\Debug\net6.0\refint\Engine.dll" />
+    <None Include="obj\Debug\net6.0\ref\Engine.dll" />
     <None Include="obj\Engine.csproj.nuget.g.props" />
     <None Include="obj\Engine.csproj.nuget.g.targets" />
     <None Include="obj\project.nuget.cache" />
