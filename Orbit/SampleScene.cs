@@ -34,7 +34,7 @@ internal class SampleScene : Scene
     public override void OnBegined()
     {
 
-        Filter = TextureFilter.TEXTURE_FILTER_BILINEAR;
+        Filter = TextureFilter.TEXTURE_FILTER_POINT;
 
         var position = ViewPortScale / 2f;
         var radius = MathF.Min(ViewPortWidth, ViewPortHeight) / 4f;
@@ -48,6 +48,8 @@ internal class SampleScene : Scene
             .AddComponent<CameraController>()
             .AddComponent<UICanvas>()
                 .SetRenderOrder(int.MaxValue)
+            //.AddComponent<FollowCursor>()
+            .AddComponent<CircleRenderer>(new (5,Color.RED))
 
             
             .Entity
@@ -65,7 +67,7 @@ internal class SampleScene : Scene
                 .SetTintColor(col)
             .AddComponent(new Background(0.7f))
             .AddComponent(new Gradient(16,16,Color.BLANK,Color.BLANK, graCol, graCol))
-            .Transform.SetScale(1,1,5f)
+            .Transform.SetScale(1,1,1f)
             ;
 
 
@@ -77,22 +79,23 @@ internal class SampleScene : Scene
         var player = CreateEntity("Player", Vector2.UnitY)
                 .SetProcessOrder(1)
 
-                .AddComponent<Ball>()
+                .AddComponent<Player>()
                 //.AddComponent<Trail>(new())
                 .Entity
                 ;
         ;
 
-        #region Player's Children
+        #region Player's Children (BALL RENDER)
         CreateChildEntity(player, "player-image")
             //.AddComponent<CircleRenderer>(new(10, Color.GREEN))
             .AddComponent<SpriteRenderer>(new(ContentManager.Get<rTexture>("ball"))).SetRenderOrder(10)
             .AddComponent<test>()
+            .Transform.SetScale(1f,1f,1f);
                 ;
         #endregion
     }
 
-    public static Entity CreatePlanet(Scene scene,Vector2 position,float radius,out Planet planet)
+    public static Entity CreatePlanet(Scene scene,Vector2 position,int radius,out Planet planet)
     {
         /////////////////////////////////////////////////////////
         var planet_root = scene.CreateEntity("Planet", position)
@@ -105,7 +108,7 @@ internal class SampleScene : Scene
         var color = Raylib.ColorFromNormalized(new Vector4(Random.Shared.NextSingle(), Random.Shared.NextSingle(), Random.Shared.NextSingle(), 1f));
 
         scene.CreateChildEntity(planet_root, "planet-image", Vector2.Zero, false)
-            .AddComponent<RingRenderer>(new(radius,radius - 30, color))
+            .AddComponent<RingRenderer>(new(radius,radius /2, color))
             //.AddComponent<SpriteRenderer>(new(ContentManager.Get<rTexture>("moon")));
             ;
         var planet_center =

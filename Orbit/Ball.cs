@@ -17,7 +17,7 @@ public class test : Component
         Console.WriteLine("test");
     }
 }
-public class Ball : Component, IUpdatable
+public class Player : Component, IUpdatable
 {
     int IUpdatable.UpdateOrder { get; set; }
 
@@ -137,6 +137,8 @@ public class Ball : Component, IUpdatable
 
     float startA, endA;
     ICoroutine? ballReturning,ballSpining;
+    private float stretchFactor = 4f;
+
     public override void OnDebugRender()
     {
         var c = GameSceneManager.Instance.CurrentPlanet;
@@ -169,7 +171,7 @@ public class Ball : Component, IUpdatable
             //Console.WriteLine(elapse);
 
             var easingRotation = Easings.EaseSineIn(elapse, start, offset, duration);
-            var easingScaleX = Easings.EaseSineIn(elapse, prevLocalScale.X, 2f * duration, duration);
+            var easingScaleX = Easings.EaseSineIn(elapse, prevLocalScale.X, stretchFactor * duration, duration);
 
             GameSceneManager.Instance.CurrentPlanet.centerTF.SetEulerRotation(new (0,0,easingRotation));
 
@@ -186,8 +188,9 @@ public class Ball : Component, IUpdatable
 
         /// Return to orginal value 
         Transform.SetLocalScale(prevLocalScale);
-        Transform.SetLocalRotationZ(prevLocalRotZ);
+        Transform.SetLocalRotationZ(0);
         
+        //Entity.GetComponentInChilds<SpriteRenderer>().Transform.Rotation = GameSceneManager.Instance.CurrentPlanet.
         ballSpining = null;
     }
     IEnumerator TweenLocal( Vector2 from,Vector2 to,Func<float,float,float,float,float> easingAction)

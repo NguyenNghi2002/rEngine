@@ -23,18 +23,19 @@ public class GameCore : Engine.Core
 
         WindowWidth = currDecive.Y;
         WindowHeight = currDecive.X;
-        
 
         //                               /*  START WINDOW */
         ///---------------------------------------------------------------------------------///
 
         base.Initialize();
 
+        Raylib.SetExitKey(KeyboardKey.KEY_NULL);
 
         //                                 /*  CREATE SCENE */
         ///----------------------------------------------------------------------------------///
         var ratio = 1280f / 720f;
-        Scene = new SampleScene("Sample", 720, 1280);
+        
+        Scene = new SampleScene("Sample", 128, 128);
         //Scene.Scaling = Engine.SceneManager.DesignScaling.Truncate;
 
 

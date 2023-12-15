@@ -143,15 +143,16 @@ namespace Engine.UI
 			}
 			var rec = new Rectangle(x, y, width, height);
 
-			rec = rec.SetBot(rec.BotRight().Y -  BottomHeight);
-			rec = rec.SetTop(rec.TopLeft().Y +  TopHeight);
-			rec = rec.SetLeft(rec.TopLeft().X +  LeftWidth);
-			rec = rec.SetRight(rec.BotRight().X -  RightWidth);
+			rec = rec.SetBot( (rec.BotRight().Y -  BottomHeight));
+			rec = rec.SetTop((rec.TopLeft().Y +  TopHeight));
+			rec = rec.SetLeft((rec.TopLeft().X +  LeftWidth));
+			rec = rec.SetRight((rec.BotRight().X -  RightWidth));
 
+			var intRec = new Rectangle((int)rec.x, (int) rec.y, (int)rec.width, (int)rec.height);
 			if (UseFilledRect && col.a != 0)
-				Raylib.DrawRectanglePro(rec, Vector2.Zero, 0, col);
+				Raylib.DrawRectanglePro(intRec, Vector2.Zero, 0, col);
 			if (!UseFilledRect || (UseOutline && UseFilledRect) && outlineCol.a != 0)
-				Raylib.DrawRectangleLinesEx(rec, LineWidth, outlineCol);
+				Raylib.DrawRectangleLinesEx(intRec, (int)LineWidth, outlineCol);
 		}
 
     }

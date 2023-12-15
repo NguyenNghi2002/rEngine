@@ -78,7 +78,7 @@ public class Pulsable : Component
 }
 public class Shakable : Component
 {
-    float Intensity = 20;
+    float Intensity = 5;
     float Duration = 0.5f;
     ICoroutine c;
     public void Shake()
@@ -97,7 +97,7 @@ public class Shakable : Component
             {
                  elapse += Time.DeltaTime;
                 elapse = elapse.ClampMax(Duration);
-                Transform.Position = RayUtils.RandomPointInCircle(origin,Intensity * (1 - elapse/Duration)).ToVec3();
+                Transform.Position = RayUtils.RandomPointInCircle(origin,Intensity * (1 - elapse/Duration)).ToVec3().ToInt3();
             }
 
             yield return null;

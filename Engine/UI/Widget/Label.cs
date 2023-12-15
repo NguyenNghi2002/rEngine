@@ -380,7 +380,10 @@ namespace Engine.UI
 			var color = Raylib.ColorAlpha(this.color, (int)(this.color.a * parentAlpha));
 			_style.Background?.Draw( x, y, width == 0 ? _prefSize.X : width, height, color);
 
-			Raylib.DrawTextPro(_style.Font,_wrappedString,new Vector2(x,y) + _textPosition,Vector2.Zero,rotation,_style.FontScale,_style.Spacing,_style.FontColor);
+			//var pixelPos = new Vector2((float)(x + _textPosition.X), (float)(y + _textPosition.Y));
+			var pixelPos = new Vector2((int)(x + _textPosition.X), (int)(y + _textPosition.Y));
+			Raylib.DrawTextPro(_style.Font,_wrappedString,pixelPos
+				,Vector2.Zero,rotation,(int)_style.FontScale,(int)_style.Spacing,_style.FontColor);
 
 			//batcher.DrawString(_style.Font, _wrappedString, new Vector2(x, y) + _textPosition,
 				//_style.FontColor, 0, Vector2.Zero, new Vector2(_style.FontScaleX, _style.FontScaleY), SpriteEffects.None, 0);

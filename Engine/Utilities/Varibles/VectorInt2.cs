@@ -55,6 +55,8 @@ namespace Engine
 			return new VectorInt2(lhs.X / val, lhs.Y / val);
         }
 
+		public static implicit operator Vector2 (VectorInt2 self)
+			=> self.ToVector2();
 
 		public float Length()
 			=> (float)Math.Sqrt(X * X + Y * Y);
@@ -77,4 +79,5 @@ namespace Engine
 			;
 		public override string ToString() => String.Format($"<{X},{Y}>");
 	}
+
 }

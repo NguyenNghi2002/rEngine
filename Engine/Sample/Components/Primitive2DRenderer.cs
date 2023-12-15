@@ -24,11 +24,11 @@ namespace Engine.DefaultComponents.Render.Primitive
         {
             Rlgl.rlPushMatrix();
 
-            Rlgl.rlTranslatef(Transform.Position.X, Transform.Position.Y, Transform.Position.Z);
+            Rlgl.rlTranslatef((int)Transform.Position.X, (int)Transform.Position.Y, (int)Transform.Position.Z);
             Rlgl.rlRotatef(Transform.EulerRotation.Z * Raylib.RAD2DEG, 0, 0, 1);
             Rlgl.rlScalef(Transform.Scale.X, Transform.Scale.Y, Transform.Scale.Z);
 
-            Raylib.DrawCircle(0, 0, Radius, Color);
+            Raylib.DrawCircle(0, 0, (int)Radius, Color);
             Rlgl.rlPopMatrix();
         }
 
@@ -39,7 +39,7 @@ namespace Engine.DefaultComponents.Render.Primitive
         }
     }
 
-    public class RingRenderer : CircleRenderer
+    public class RingRenderer : CircleRenderer,ICustomInspectorImgui
     {
         public float HollowRadius;
         public float startAngle = 0,endAngle = 360;
@@ -57,9 +57,15 @@ namespace Engine.DefaultComponents.Render.Primitive
             Rlgl.rlScalef(Transform.Scale.X, Transform.Scale.Y, Transform.Scale.Z);
 
 
-            Raylib.DrawRing(Vector2.Zero,HollowRadius,Radius,startAngle,endAngle,0,Color);
+            Raylib.DrawRing(Vector2.Zero, HollowRadius,Radius,startAngle,endAngle,100,Color);
 
             Rlgl.rlPopMatrix();
+        }
+        void ICustomInspectorImgui.OnInspectorGUI()
+        {
+            ImGui.SetNextItemWidth(40);
+            ImGuiNET.ImGui.DragFloat("outer radius", ref Radius, 1, 0, int.MaxValue, "%0f");
+            ImGuiNET.ImGui.DragFloat("inner radius", ref HollowRadius, 1, 0, int.MaxValue, "%0f");
         }
     }
 
@@ -88,6 +94,7 @@ namespace Engine.DefaultComponents.Render.Primitive
             ImGuiNET.ImGui.DragFloat("width", ref Dimension.X, 1, 0, int.MaxValue, "%0f");
             ImGuiNET.ImGui.DragFloat("height", ref Dimension.Y, 1, 0, int.MaxValue, "%0f");
         }
+
     }
 
 
