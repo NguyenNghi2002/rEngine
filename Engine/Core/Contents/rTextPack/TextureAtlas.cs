@@ -1,6 +1,8 @@
 ﻿using Engine;
 using Raylib_cs;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO.Enumeration;
 using System.Net;
 using System.Xml.Linq;
 
@@ -10,28 +12,59 @@ namespace Engine.Texturepacker
     public class TextureAtlas : AtlasDocument,IDisposable
     {
 
-        public rTexture Texture;
+        public Texture2D? Texture;
 
         public string ImagePath;
         public int Width, Height;
         public int SpriteCount;
         public bool IsFont;
         public int FontSize;
-        public Dictionary<string,Sprite> Sprites;
+        public Dictionary<string,Sprite> Sprites ;
 
 
         public TextureAtlas() { }
+
+        public TextureAtlas(string path,int collumnCount,int rowCount)
+        {
+            Texture = ContentManager.Load<Texture2D>(Path.GetFileNameWithoutExtension(path), path);
+            Debug.Assert(Texture.Value.id != 0);
+            ImagePath = path;
+            Width = Texture.Value.width;
+            Height = Texture.Value.height;
+            IsFont = false;
+            FontSize = 0;
+
+            var spriteWidth =  Texture.Value.width / collumnCount ;
+            var spriteHeight =  Texture.Value.height / rowCount;
+
+            Sprites = new Dictionary<string, Sprite>();
+            for (int y = 0; y < rowCount; y++)
+            {
+                for (int x = 0; x < collumnCount; x++)
+                {
+                    int px = x * spriteWidth;
+                    int py = y * spriteHeight;
+                    var sprite = new Sprite(this,$"{x},{y}",px,py,spriteWidth,spriteHeight);
+                    Sprites.Add(sprite.Name, sprite);
+                }
+            }
+                
+        }
         public TextureAtlas(string path)
         {
-            Load(ReadXml(path));
+            LoadFromData(ReadXml(path));
         }
 
         public void Dispose()
         {
-            Texture.Dispose();  
+            if(Texture != null)
+            {
+                Raylib.UnloadTexture(Texture.Value);
+                Texture = null;
+            }
         }
 
-        private void Load(XDocument xDoc)
+        private void LoadFromData(XDocument xDoc)
         {
             var atlas= xDoc.Element("AtlasTexture");
 
@@ -50,9 +83,11 @@ namespace Engine.Texturepacker
             }
 
             var imageFullPath = Path.Combine(Directory, ImagePath);
-            Texture = rTexture.Load(imageFullPath);
+            Texture = ContentManager.Load<Texture2D>(Path.GetFileNameWithoutExtension(imageFullPath), imageFullPath);
 
         }
 
+  
+ 
     }
 }

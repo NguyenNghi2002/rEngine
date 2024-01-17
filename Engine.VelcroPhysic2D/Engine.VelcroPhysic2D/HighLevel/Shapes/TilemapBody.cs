@@ -51,7 +51,7 @@ namespace Engine.Velcro
         {
             base.OnAddedToEntity();
 
-            if (Entity.TryGetComponent<TileMap>(out var tilemap))
+            if (Entity.TryGetComponent<TileMapRenderer>(out var tilemap))
             {
                 Map = tilemap.Map;
                 SetColliderLayer(Map.Layers[_colliderLayerName]);

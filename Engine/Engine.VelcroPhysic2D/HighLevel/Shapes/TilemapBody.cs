@@ -1,5 +1,4 @@
-﻿using Engine.External;
-using Engine.TiledSharp;
+﻿using Engine.TiledSharp;
 using Engine.Velcro.Unit;
 using Genbox.VelcroPhysics.Collision.Shapes;
 using Genbox.VelcroPhysics.Dynamics;
@@ -51,7 +50,7 @@ namespace Engine.Velcro
         {
             base.OnAddedToEntity();
 
-            if (Entity.TryGetComponent<TileMap>(out var tilemap))
+            if (Entity.TryGetComponent<TileMapRenderer>(out var tilemap))
             {
                 Map = tilemap.Map;
                 SetColliderLayer(Map.Layers[_colliderLayerName]);

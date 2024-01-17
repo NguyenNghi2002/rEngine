@@ -110,9 +110,9 @@ namespace Engine.SceneManager
                 virtualMouse;
         } 
         public float ViewPortWidth
-            => FinalRenderTexture.Texture.Width / Camera.zoom;
+            => FinalRenderTexture.texture.width / Camera.zoom;
         public float ViewPortHeight
-            => FinalRenderTexture.Texture.Height / Camera.zoom;
+            => FinalRenderTexture.texture.height / Camera.zoom;
         public Vector2 ViewPortScale
             => new Vector2(ViewPortWidth, ViewPortHeight);
         public Vector2 GetMouseWorldPosition()
@@ -132,7 +132,7 @@ namespace Engine.SceneManager
         }
 
         public Vector2 GetRenderTextureScale()
-            => new Vector2(FinalRenderTexture.Texture.Width, FinalRenderTexture.Texture.Height);
+            => new Vector2(FinalRenderTexture.texture.width, FinalRenderTexture.texture.height);
         public override string ToString()
         {
             return String.Format($"{SceneName} - {SceneEntitiesList.Count}");

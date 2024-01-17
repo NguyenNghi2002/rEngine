@@ -8,9 +8,13 @@ using System.Globalization;
 using System.IO;
 using System.Xml;
 using System.Linq;
+using System.Diagnostics;
 
 namespace Engine.TiledSharp
 {
+    /// <summary>
+    /// data of tilemap parse from tmx file.
+    /// </summary>
     public class TmxMap : TmxDocument
     {
         public string Version {get; private set;}
@@ -27,12 +31,12 @@ namespace Engine.TiledSharp
         public int Height {get; private set;}
 
         /// <summary>
-        /// Width of signle tile
+        /// Width of single <see cref="TmxLayerTile"/>
         /// </summary>
         public int TileWidth {get; private set;}
 
         /// <summary>
-        /// Height of signle tile
+        /// Height of single tile
         /// </summary>
         public int TileHeight {get; private set;}
         public int? HexSideLength {get; private set;}
@@ -177,9 +181,9 @@ namespace Engine.TiledSharp
             }
         }
         /// <summary>
-        /// Find <see cref="TmxTileset"/> contain gid
+        /// Find <see cref="TmxTileset"/> (tileset) that contain given single tile ID (gid)
         /// </summary>
-        /// <param name="gid"></param>
+        /// <param name="gid">til ID of <see cref="  "/>></param>
         /// <returns></returns>
         public TmxTileset GetTilesetFromGid(int gid)
         {
@@ -190,11 +194,20 @@ namespace Engine.TiledSharp
                 if (Tilesets[i].FirstGid <= gid)
                     return Tilesets[i];
             }
-
             throw new Exception($"tile gid {gid} was not found in any tile set");
 
         }
 
+        public void TilesetLocationFromGid(int gid,out int x, out int y)
+        {
+            Debug.Assert(gid > 0,"gid should be larger than 0") ;
+
+            var tileset = GetTilesetFromGid(gid);
+
+            var localGid = gid - tileset.FirstGid;
+            x = (int)(localGid % tileset.Columns);
+            y = (int)(localGid / tileset.Columns);
+        }
         public void Unload()
         {
             foreach (var tileset in Tilesets)
@@ -205,6 +218,7 @@ namespace Engine.TiledSharp
         }
     }
 
+    #region Enums
     public enum OrientationType
     {
         Unknown,
@@ -232,5 +246,6 @@ namespace Engine.TiledSharp
         RightUp,
         LeftDown,
         LeftUp
-    }
+    } 
+    #endregion
 }

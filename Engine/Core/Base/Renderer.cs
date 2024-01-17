@@ -6,8 +6,8 @@ namespace Engine.Renderering
 {
     public abstract class Renderer 
     {
-        protected rRenderTexture _renderTexture;
-        public rRenderTexture RenderTexture => _renderTexture;
+        protected RenderTexture2D? _renderTexture;
+        public RenderTexture2D? RenderTexture => _renderTexture;
 
 
         public Material? Material;
@@ -29,15 +29,15 @@ namespace Engine.Renderering
             {
                 var newWidth = scene.screenWidth;
                 var newHeight = scene.screenHeight;
-                var currentWidth = _renderTexture.Texture.Width;
-                var currentHeight = _renderTexture.Texture.Height;
+                var currentWidth = _renderTexture.Value.texture.width;
+                var currentHeight = _renderTexture.Value.texture.height;
                 if (currentWidth == newWidth && currentHeight == newHeight)
                     return;
 
-                Raylib.UnloadRenderTexture(_renderTexture);
+                Raylib.UnloadRenderTexture(_renderTexture.Value);
                 _renderTexture = null;
             }
-            _renderTexture = rRenderTexture.Load(scene.screenWidth, scene.screenHeight);
+            _renderTexture = Raylib.LoadRenderTexture(scene.screenWidth, scene.screenHeight);
             //RenderTexture =  Raylib.LoadRenderTexture(scene.sceneWidth,scene.sceneHeight);
         }
 
@@ -45,7 +45,10 @@ namespace Engine.Renderering
         public virtual void Unload()
         {
             if (_renderTexture != null)
-                Raylib.UnloadRenderTexture(_renderTexture);
+            {
+                Raylib.UnloadRenderTexture(_renderTexture.Value);
+                _renderTexture = null;
+            }
         }
         #region Utilities
         protected void HandleBeginBlendingAndMaterial()
@@ -71,15 +74,15 @@ namespace Engine.Renderering
 
         protected virtual void BeginRender(Camera2D cam2D)
         {
-            if (RenderTexture == null) return;
-            Raylib.BeginTextureMode(_renderTexture);
+            if (_renderTexture == null) return;
+            Raylib.BeginTextureMode(_renderTexture.Value);
             Raylib.BeginMode2D(cam2D);
             Raylib.ClearBackground(RenderClearColor);
             HandleBeginBlendingAndMaterial();
         }
         protected virtual void EndRender()
         {
-            if (RenderTexture == null) return;
+            if (_renderTexture == null) return;
             HandleEndBlendingAndMaterial();
             Raylib.EndMode2D();
             Raylib.EndTextureMode();
@@ -87,7 +90,7 @@ namespace Engine.Renderering
 
         public override void OnAddedToScene(Scene scene)
         {
-            _renderTexture = rRenderTexture.Load(scene.screenWidth, scene.screenHeight);
+            _renderTexture = Raylib.LoadRenderTexture(scene.screenWidth, scene.screenHeight);
         }
 
         
@@ -104,7 +107,7 @@ namespace Engine.Renderering
         {
             if (_renderTexture == null) return;
 
-            Raylib.BeginTextureMode(_renderTexture);
+            Raylib.BeginTextureMode(_renderTexture.Value);
             Raylib.BeginMode3D(cam3D);
             Raylib.ClearBackground(RenderClearColor);
             HandleBeginBlendingAndMaterial();

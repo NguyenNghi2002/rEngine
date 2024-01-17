@@ -11,9 +11,8 @@ namespace Engine
 
         public void Update()
         {
-            var m = Scene.GetMouseWorldPosition() ;
-            if(Transform.Position2 != m)
-                Transform.Position = new (m,Transform.Position.Z) ;
+            Transform.Position2 = Scene.GetMouseWorldPosition() ;
+                
             if (Scene.TryFindComponent<UICanvas>(out var ui))
             {
                 var a= ui.Stage.Hit(Input.MousePosition);

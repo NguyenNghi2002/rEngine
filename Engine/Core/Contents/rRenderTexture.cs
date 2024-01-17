@@ -1,11 +1,12 @@
-﻿using Raylib_cs;
+﻿#if false
+using Raylib_cs;
 
 namespace Engine
 {
-    public class rRenderTexture : Resource
+    public class rRenderTexture
     {
         private RenderTexture2D _renderTexture;
-        private rTexture _texture;
+        private Texture2D _texture;
 
         public TextureFilter Filter
         {
@@ -18,12 +19,12 @@ namespace Engine
         public rTexture Texture => _texture;
         public rRenderTexture SetFilter(TextureFilter filter)
         {
-            Raylib.SetTextureFilter(_texture,filter);
+            Raylib.SetTextureFilter(_texture, filter);
             return this;
         }
         public rRenderTexture SetWarp(TextureWrap warpmode)
         {
-            Raylib.SetTextureWrap(_renderTexture.texture,warpmode);
+            Raylib.SetTextureWrap(_renderTexture.texture, warpmode);
             return this;
         }
         public void Dispose()
@@ -50,4 +51,5 @@ namespace Engine
         }
 
     }
-}
+} 
+#endif

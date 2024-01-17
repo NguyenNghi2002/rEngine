@@ -12,7 +12,8 @@ namespace Engine.Texturepacker
         /// <summary>
         /// Sprite name ID
         /// </summary>
-        public string Name;
+        public readonly string Name;
+
         public int OriginX,OriginY;
         public int PositionX,PositionY;
         public int SourceWidth,SourceHeight;
@@ -27,14 +28,23 @@ namespace Engine.Texturepacker
             new Rectangle(TrimmedX,TrimmedY,TrimmedWidth,TrimmedHeight):
             new Rectangle(PositionX,PositionY,SourceWidth,SourceHeight);
 
-        public Sprite(rTexture texture)
+        public Sprite(Texture2D texture)
         {
             Atlas = new TextureAtlas()
             {
                 Texture = texture,
             };
-            SourceWidth = texture.Width;
-            SourceHeight = texture.Height;
+            SourceWidth = texture.width;
+            SourceHeight = texture.height;
+        }
+        public Sprite(TextureAtlas textureAtlas,string name,int x,int y,int width,int height)
+        {
+            Name = name;
+            Atlas = textureAtlas;
+            PositionX = x;
+            PositionY = y;
+            SourceWidth = width;
+            SourceHeight = height;
         }
 
         public Sprite(TextureAtlas textureAtlas,XElement xElement)
@@ -53,7 +63,6 @@ namespace Engine.Texturepacker
             TrimmedY = (int?)xElement.Attribute("trimRecX") ?? 0;
             TrimmedWidth = (int?)xElement.Attribute("trimRecWidth") ?? 0;
             TrimmedHeight = (int?)xElement.Attribute("trimRecHeight") ?? 0;
-
         }
     }
 }

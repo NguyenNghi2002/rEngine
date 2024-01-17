@@ -5,7 +5,7 @@ using System.Numerics;
 namespace Engine
 {
 
-    public class rFont : Resource
+    public class rFont :IDisposable
     {
         public static readonly rFont Default = new rFont(Raylib.GetFontDefault());
 
@@ -54,7 +54,7 @@ namespace Engine
             =>Raylib.MeasureTextEx(_font.Value, text, Size, Spacing);
 
 
-        public override void Dispose()
+        public  void Dispose()
         {
             if (_font.HasValue)
             {

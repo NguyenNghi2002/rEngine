@@ -1,6 +1,8 @@
-﻿namespace Engine.Collections.Generic
+﻿using System.Collections;
+
+namespace Engine.Collections.Generic
 {
-    public class Map<T1, T2>
+    public class Map<T1, T2> 
     {
         private Dictionary<T1, T2> _forward = new Dictionary<T1, T2>();
         private Dictionary<T2, T1> _reverse = new Dictionary<T2, T1>();

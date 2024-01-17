@@ -74,17 +74,17 @@ namespace Engine
 
 		/// <summary>
 		/// Draw strech-able texture.
-		/// Note, texture coord in source is different from destination.
+		/// Position relative to bottom left as zero zero for the source and top left for screen coordinate.
 		/// </summary>
 		/// <param name="texture">Texture2D</param>
 		/// <param name="src1">Source top left</param>
 		/// <param name="src2">Source top right</param>
 		/// <param name="src3">Source bottom right</param>
 		/// <param name="src4">Source bottom left</param>
-		/// <param name="dest1"></param>
-		/// <param name="dest2"></param>
-		/// <param name="dest3"></param>
-		/// <param name="dest4"></param>
+		/// <param name="dest1">bottom left</param>
+		/// <param name="dest2">bottom right</param>
+		/// <param name="dest3">top right</param>
+		/// <param name="dest4">top left</param>
 		/// <param name="tintColor">tint Color</param>
 		/// <param name="quadCount">quad subdivide count</param>
 		public static void DrawTextureDynamicPro(Texture2D texture,

@@ -2,7 +2,7 @@
 
 namespace Engine
 {
-    public class rShader : Resource
+    public class rShader 
     {
         private Shader _shader;
 

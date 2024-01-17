@@ -2,6 +2,7 @@
 using Raylib_cs;
 using Raylib_cs.Extension;
 using System.Data;
+using System.Diagnostics;
 using System.Net;
 using System.Numerics;
 
@@ -10,7 +11,7 @@ namespace Engine
 {
     public class ScrollingSpriteRenderer : TiledSpriteRenderer,IUpdatable
     {
-        public ScrollingSpriteRenderer(rTexture texture,float scrollXSpeed = 15, float scrollYSpeed = 5) : base(texture)
+        public ScrollingSpriteRenderer(Texture2D texture,float scrollXSpeed = 15, float scrollYSpeed = 5) : base(texture)
         {
             this.ScrollSpeedX = scrollXSpeed;
             this.ScrollSpeedY = scrollYSpeed;
@@ -52,7 +53,7 @@ namespace Engine
         }
 
         Rectangle _sourceRec;
-        public TiledSpriteRenderer(rTexture texture) : base(texture)
+        public TiledSpriteRenderer(Texture2D texture) : base(texture)
         {
             _sourceRec = Sprite.SourceRec;
         }
@@ -61,8 +62,11 @@ namespace Engine
         {
             UpdateDrawInfo();
             var degree = Entity.Transform.EulerRotation.Z * Raylib.RAD2DEG;
-            if (Sprite != null && Sprite.Atlas.Texture.ID != 0)
-                Raylib.DrawTexturePro(Sprite.Atlas.Texture, _sourceRec, destination, Origin, degree, TintColor);
+            var texture = Sprite.Atlas.Texture.Value;
+            if (Sprite != null && texture.id != 0)
+            {
+                Raylib.DrawTexturePro(texture, _sourceRec, destination, Origin, degree, TintColor);
+            }
             else
             {
                 Raylib.DrawTextPro(rFont.Default, $"[{Entity.Name}]SpriteRenderer", Transform.Position.ToVec2(), default, 0, 20, 2, TintColor);
@@ -149,11 +153,13 @@ namespace Engine
         /// </summary>
         /// <param name="texture"></param>
         /// <param name="syncTransform">transform</param>
-        public SpriteRenderer(rTexture texture):this(new Sprite(texture)) { }
+        public SpriteRenderer(Texture2D texture):this(new Sprite(texture)) { }
         public SpriteRenderer(Sprite sprite)
         {
             SetSprite(sprite);
             SetTintColor(Color.WHITE);
+
+            Debug.Assert(_sprite != null);
         }
 
         public override void OnTransformChanged(Transformation.Component component)
@@ -181,9 +187,10 @@ namespace Engine
         {
             UpdateDrawInfo();
             var degree = Entity.Transform.EulerRotation.Z * Raylib.RAD2DEG;
-            if (Sprite != null && _sprite.Atlas.Texture.ID != 0)
+            var texture = _sprite.Atlas.Texture.Value;
+            if (Sprite != null && texture.id != 0)
             {
-                Raylib.DrawTexturePro(Sprite.Atlas.Texture, source, destination, Origin, degree, TintColor);
+                Raylib.DrawTexturePro(texture, source, destination, Origin, degree, TintColor);
             }
             else
             {
@@ -231,19 +238,19 @@ namespace Engine
                 | ImGuiNET.ImGuiColorEditFlags.DefaultOptions;
             if(_sprite != null)
             {
-                var txt = _sprite.Atlas.Texture;
+                var txt = _sprite.Atlas.Texture.Value;
                 if (ImGuiNET.ImGui.ColorEdit4("Tint Color", ref _tintColorNormal, flags))
                 {
                     TintColor = Raylib.ColorFromNormalized(_tintColorNormal);
                 }
                 ImGuiNET.ImGui.Separator();
                 ImGuiNET.ImGui.TextColored(_tintColorNormal, "Texture");
-                ImGuiNET.ImGui.Image((IntPtr)txt.ID, txt.Scale(), _sprite.SourceRec.TopLeft() / txt.Scale(), _sprite.SourceRec.BotRight() / txt.Scale(), _tintColorNormal);
+                ImGuiNET.ImGui.Image((IntPtr)txt.id, txt.Scale(), _sprite.SourceRec.TopLeft() / txt.Scale(), _sprite.SourceRec.BotRight() / txt.Scale(), _tintColorNormal);
                 ImGuiNET.ImGui.SameLine();
 
                 
-                ImGuiNET.ImGui.Text(txt.Height.ToString());
-                ImGuiNET.ImGui.Text(txt.Width.ToString());
+                ImGuiNET.ImGui.Text(txt.height.ToString());
+                ImGuiNET.ImGui.Text(txt.width.ToString());
             }
         } 
 #endif
@@ -259,28 +266,5 @@ namespace Engine
 
     }
 
-#if false
-    internal class SpriteRenderer : RenderableComponent
-    {
-        public Texture2D _texture;
 
-
-        public SpriteRenderer(Texture2D texture)
-        {
-            this._texture = texture;
-        }
-
-        public override void Render()
-        {
-            var src = new Rectangle(0, 0, _texture.width, _texture.height);
-            var dst = new Rectangle(
-                Transfrom.Position.X,
-                Transfrom.Position.Y,
-                Transfrom.Scale.X * src.width,
-                Transfrom.Scale.Y * src.height);
-            Raylib.DrawTexturePro(_texture, src, dst, default, 0, Color.WHITE);
-            Raylib.DrawTexture(_texture, (int)Transfrom.Position.X, (int)Transfrom.Position.Y, Color.WHITE);
-        }
-    } 
-#endif
 }

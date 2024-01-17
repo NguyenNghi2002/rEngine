@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="CommandSystem.cs" />
+    <Compile Include="Character.cs" />
+    <Compile Include="FloorCell.cs" />
+    <Compile Include="GameMananger.cs" />
+    <Compile Include="Grid.cs" />
+    <Compile Include="GridObject.cs" />
+    <Compile Include="MoveCommand.cs" />
+    <Compile Include="Pushable.cs" />
+    <Compile Include="TileMapSnappable.cs" />
+    <Compile Include="Program.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="bin\Debug\net6.0\raylib.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Engine\Engine.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="bin\Debug\net6.0\.contents\tilemaps\" />
+  </ItemGroup>
+
+</Project>

@@ -7,7 +7,7 @@ using Raylib_cs;
 
 namespace Engine.UI
 {
-    public class Skin : Resource
+    public class Skin 
     {
         Dictionary<Type, Dictionary<string, object>> _resources = new Dictionary<Type, Dictionary<string, object>>();
         ContentManager _contentManager;

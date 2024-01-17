@@ -68,10 +68,10 @@ namespace Engine.TiledSharp
             var tint = color ?? new Color((byte)imageLayer.Color.R, (byte)imageLayer.Color.G, (byte)imageLayer.Color.B);
             tint = Raylib.Fade(tint, (float)imageLayer.Opacity);
 
-            var texture = imageLayer.Image.Texture;
-            var srcRec = imageLayer.Image.Texture.RawData.Source();
+            var atlas = imageLayer.Image.TextureAtlas;
+            var srcRec = atlas.Texture.Value.Source();
             var desRec = srcRec.MuliplyScale(scale).Move(position);
-            Raylib.DrawTexturePro(texture,srcRec,desRec,Vector2.Zero,0f,tint);
+            Raylib.DrawTexturePro(atlas.Texture.Value,srcRec,desRec,Vector2.Zero,0f,tint);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -207,7 +207,7 @@ namespace Engine.TiledSharp
                 srcRec.height *= -1;
 
             //Raylib.DrawCircleV(position,10,Color.YELLOW);
-            Raylib.DrawTexturePro(tileset.Image.Texture, srcRec, desRec, Vector2.UnitY * tileScale.Y, angle, color);
+            Raylib.DrawTexturePro(tileset.Image.TextureAtlas.Texture.Value, srcRec, desRec, Vector2.UnitY * tileScale.Y, angle, color);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -219,7 +219,7 @@ namespace Engine.TiledSharp
         {
             if (tile.Gid == 0) return;
             var tileset = tile.Tileset;
-            var texture = tileset.Image.Texture;
+            var texture = tileset.Image.TextureAtlas;
 
             //Destination Info
             Vector2 tileLocation = new Vector2(tile.X, tile.Y);
@@ -283,7 +283,7 @@ namespace Engine.TiledSharp
             }
 
             var offset = desRec.Scale() / 2f;
-            Raylib.DrawTexturePro(texture, srcRec, desRec.Move(offset), offset, degree,color);
+            Raylib.DrawTexturePro(texture.Texture.Value, srcRec, desRec.Move(offset), offset, degree,color);
 
 #if false
             if (tile.DiagonalFlip)
@@ -311,6 +311,12 @@ namespace Engine.TiledSharp
 
     public static class TmxTileSetTileExt
     {
+        /// <summary>
+        /// Convert current <see cref="TmxTilesetTile"/> in to local location
+        /// </summary>
+        /// <param name="tile"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
         public static void ToLocation(this TmxTilesetTile tile,out int x,out int y)
         {
             var indexID = tile.Id;

@@ -6,6 +6,9 @@ using System.Xml.Linq;
 
 namespace Engine.TiledSharp
 {
+    /// <summary>
+    /// Group Layer
+    /// </summary>
     public class TmxGroup : ITmxLayer
     {
         public TmxMap Map;

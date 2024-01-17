@@ -8,7 +8,7 @@ namespace Engine.Texturepacker
     /// <summary>
     /// Support Xml
     /// </summary>
-    public class AtlasDocument  : Resource
+    public class AtlasDocument  
     {
         public string Directory { get; set; }
 

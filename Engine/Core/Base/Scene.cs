@@ -28,8 +28,10 @@ namespace Engine.SceneManager
         public TextureFilter Filter 
         { set
             {
-                _sceneRenderTxt.Filter = value;
-                FinalRenderTexture.Filter = value;
+                Raylib.SetTextureFilter(_sceneRenderTxt.texture,value);
+                Raylib.SetTextureFilter(FinalRenderTexture.texture,value);
+                //_sceneRenderTxt.texture. Filter = value;
+                //FinalRenderTexture.Filter = value;
             }
         }
         
@@ -48,8 +50,8 @@ namespace Engine.SceneManager
         public EntityList SceneEntitiesList { set; get; } //Added in constructor
 
         /** RENDER INFOS **/
-        rRenderTexture _sceneRenderTxt;
-        protected rRenderTexture FinalRenderTexture { private set; get; }
+        RenderTexture2D _sceneRenderTxt;
+        protected RenderTexture2D FinalRenderTexture { private set; get; }
         Rectangle _finalRectangle;
 
         internal IFinalRender FinalRenderer;
@@ -63,6 +65,7 @@ namespace Engine.SceneManager
                 screenHeight = value.Y;
                 UpdateRenderers();
             }
+            
         }
 
         public Scene(string sceneName, int width, int height, Color backgroundColor,Color letterBoxClearColor )
@@ -108,11 +111,12 @@ namespace Engine.SceneManager
             OnLoad();
              
             /** RENDERER  **/
-            FinalRenderTexture = rRenderTexture.Load(screenWidth, screenHeight);
-            _sceneRenderTxt = rRenderTexture.Load(screenWidth, screenHeight);
+            FinalRenderTexture = Raylib.LoadRenderTexture(screenWidth, screenHeight);
+            _sceneRenderTxt = Raylib.LoadRenderTexture(screenWidth, screenHeight);
 
-            FinalRenderTexture.SetFilter(TextureFilter.TEXTURE_FILTER_BILINEAR);
-            _sceneRenderTxt.SetFilter(TextureFilter.TEXTURE_FILTER_BILINEAR);
+            Filter = TextureFilter.TEXTURE_FILTER_BILINEAR;
+            //FinalRenderTexture.SetFilter(TextureFilter.TEXTURE_FILTER_BILINEAR);
+            //_sceneRenderTxt.SetFilter(TextureFilter.TEXTURE_FILTER_BILINEAR);
 
             UpdateRenderers();
             if (Renderers.Count == 0)
@@ -141,11 +145,9 @@ namespace Engine.SceneManager
             _sceneComponents.ForEach((c) => c.OnRemoveFromScene());
             _sceneComponents.Clear();
 
-            FinalRenderTexture.Dispose();
-            _sceneRenderTxt.Dispose();
+            Raylib.UnloadRenderTexture(FinalRenderTexture);
+            Raylib.UnloadRenderTexture(_sceneRenderTxt);
 
-            FinalRenderTexture = null;
-            _sceneRenderTxt = null;
             SceneEntitiesList = null;
 
             OnUnload();
@@ -199,10 +201,10 @@ namespace Engine.SceneManager
                 {
                     x = 0,
                     y = 0,
-                    width = renderer.RenderTexture.Texture.Width,
-                    height = -renderer.RenderTexture.Texture.Height,
+                    width =     renderer.RenderTexture.Value.texture.width,
+                    height = - renderer.RenderTexture.Value.texture.height, // Flip for opengl coordinate reason
                 };
-                Raylib.DrawTexturePro(renderer.RenderTexture.Texture, src, new Rectangle(0, 0, screenWidth, screenHeight), Vector2.Zero, 0, Color.WHITE);
+                Raylib.DrawTexturePro(renderer.RenderTexture.Value.texture, src, new Rectangle(0, 0, screenWidth, screenHeight), Vector2.Zero, 0, Color.WHITE);
                 OnRender();
             }
 
@@ -228,10 +230,10 @@ namespace Engine.SceneManager
                 x = 0,
                 y = 0,
 
-                width = FinalRenderTexture.Texture.Width,
-                height = -FinalRenderTexture.Texture.Height,
+                width = FinalRenderTexture.texture.width,
+                height = -FinalRenderTexture.texture.height,
             };
-            Raylib.DrawTexturePro(FinalRenderTexture.Texture,
+            Raylib.DrawTexturePro(FinalRenderTexture.texture,
                 src,
                 _finalRectangle, Vector2.Zero,
                 0, Color.WHITE
@@ -252,8 +254,8 @@ namespace Engine.SceneManager
                     {
                         x = 0,
                         y = 0,
-                        width = FinalRenderTexture.Texture.Width,
-                        height = FinalRenderTexture.Texture.Height,
+                        width = FinalRenderTexture.texture.width,
+                        height = FinalRenderTexture.texture.height,
                     };
                 case DesignScaling.LetterBox:
 

@@ -22,12 +22,12 @@ namespace Engine.UI
             this.MinHeight = minHeight;
             this.Sprite = sprite;
         }
-        public SpriteDrawable(rTexture texture) : this(texture.Width,texture.Height,new Sprite(texture)) { }
+        public SpriteDrawable(Texture2D texture) : this(texture.width,texture.height,new Sprite(texture)) { }
         public SpriteDrawable(Sprite sprite) : this(sprite.SourceWidth,sprite.SourceHeight,sprite) { }
         public void Draw(float x, float y, float width, float height, Color color)
         {
             if(Sprite != null)
-            Raylib.DrawTexturePro(Sprite.Atlas.Texture, new Rectangle(Sprite.PositionX, Sprite.PositionY, Sprite.SourceWidth, Sprite.SourceHeight), new Rectangle(x, y, width, height), Vector2.Zero, 0, color);
+            Raylib.DrawTexturePro(Sprite.Atlas.Texture.Value, new Rectangle(Sprite.PositionX, Sprite.PositionY, Sprite.SourceWidth, Sprite.SourceHeight), new Rectangle(x, y, width, height), Vector2.Zero, 0, color);
         }
 
         public void SetPadding(float top, float bottom, float left, float right)

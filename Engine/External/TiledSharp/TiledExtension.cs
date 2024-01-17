@@ -1,4 +1,6 @@
-﻿using System.Runtime.CompilerServices;
+﻿using Engine.Collections.Generic;
+using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace Engine.TiledSharp.Extension
 {
@@ -87,6 +89,44 @@ namespace Engine.TiledSharp.Extension
             return null;
         }
 
+        /// <summary>
+        /// Get location of selected tile from world point
+        /// </summary>
+        /// <param name="layer"></param>
+        /// <param name="worldPoint"></param>
+        /// <returns></returns>
+        public static VectorInt2 GetLocation(this TmxLayer layer, Vector2 worldPoint)
+        {
+            int x = (int)MathF.Floor(worldPoint.X / layer.Map.TileWidth);
+            int y = (int)MathF.Floor(worldPoint.Y / layer.Map.TileHeight);
+            return new VectorInt2(x, y);
+        }
+
+        public static TmxLayerTile? GetTileFromWorldPoint(this TmxLayer layer, Vector2 worldPoint)
+        {
+            int x = (int)MathF.Floor(worldPoint.X / layer.Map.TileWidth);
+            int y = (int)MathF.Floor(worldPoint.Y / layer.Map.TileHeight);
+            return layer.GetTile(x,y);
+        }
+
+        /// <summary>
+        /// Relative to the layer. This will return top left point
+        /// </summary>
+        /// <param name="tile"></param>
+        /// <returns></returns>
+        public static Vector2 GetLocalPoint(this TmxLayerTile tile)
+            => new Vector2(tile.X * tile.Map.TileWidth, tile.Y * tile.Map.TileHeight);
+        public static void ToWorldPoint(this TmxMap self,int X,int Y,out Vector2 worldPoint)
+        {
+            worldPoint = new Vector2(X*self.TileWidth,Y*self.TileHeight);
+        }
+        public static void ToLocation(this TmxMap self, Vector2 worldPoint,out int X,out int Y)
+        {
+            X = (int)MathF.Floor(worldPoint.X / self.TileWidth);
+            Y = (int)MathF.Floor(worldPoint.Y / self.TileHeight);
+        }
+
+        public static bool IsLocalInside(this TmxMap map,int x,int y) => (x >= 0 && x < map.Width) && (y >= 0 && y < map.Height);
     }
 
 }

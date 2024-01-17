@@ -3,9 +3,10 @@
     /// <summary>
     /// Customize way to import asset from file, and add to content manager
     /// </summary>
-    public interface IResourceLoader
+    public interface IResourceHandler
     {
-        public Resource Load(string path);
+        public object Load(string path);
+        public void Unload(object resource);
     }
 
 

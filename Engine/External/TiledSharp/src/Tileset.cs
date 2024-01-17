@@ -43,6 +43,7 @@ namespace Engine.TiledSharp
             Map = map;
             var xFirstGid = xTileset.Attribute("firstgid");
             var source = (string) xTileset.Attribute("source");
+            //TODO: Support auto-build.tsx
 
             if (source != null)
             {
@@ -82,7 +83,7 @@ namespace Engine.TiledSharp
                 Columns = (int?) xTileset.Attribute("columns") ;
                 TileCount = (int?) xTileset.Attribute("tilecount");
                 TileOffset = new TmxTileOffset(xTileset.Element("tileoffset"));
-                Image = new TmxImage(xTileset.Element("image"), tmxDir);
+                Image = new TmxImage(xTileset.Element("image"), tmxDir,Columns.Value,TileCount.Value/Columns.Value);
 
                 Terrains = new TmxList<TmxTerrain>();
                 var xTerrainType = xTileset.Element("terraintypes");

@@ -10,16 +10,20 @@ using Engine.AI.Pathfinding;
 using ImGuiNET;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace Engine.External
+namespace Engine
 {
-    public class TileMap : RenderableComponent,ICustomInspectorImgui
+    public class TileMapRenderer : RenderableComponent,ICustomInspectorImgui
     {
         public TmxMap Map;
 
-        List<ITmxLayer> displayLayer = new List<ITmxLayer>();
+        int[] displayLayerIndices;
 
-
-        public TileMap(TmxMap tiledMap,params string[] renderLayerNames)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tiledMap"></param>
+        /// <param name="renderLayerNames">in order of behind to top</param>
+        public TileMapRenderer(TmxMap tiledMap,params string[] renderLayerNames)
         {
             Map = tiledMap;
             SetDisplayLayer(renderLayerNames);
@@ -27,9 +31,18 @@ namespace Engine.External
 
         public override void Render()
         {
-            foreach (var layer in displayLayer)
+            if(displayLayerIndices == null)
             {
-                TiledRendering.DrawLayer(layer,Vector2.Zero,Transform.Position.ToVec2(),Transform.Scale.ToVec2());
+                TiledRendering.DrawMap(Map, Vector2.Zero, Transform.Position.ToVec2(), Transform.Scale.ToVec2());
+            }
+            else
+            {
+                foreach (int layerIndex in displayLayerIndices)
+                {
+                    var layer = Map.Layers[layerIndex];
+                    if (layer.Visible)
+                        TiledRendering.DrawLayer(layer, Vector2.Zero, Transform.Position.ToVec2(), Transform.Scale.ToVec2());
+                }
             }
             //TiledRendering.DrawMap(Map,Vector2.Zero,Transform.Position.ToVec2(),Transform.Scale.ToVec2());
             //_tilemap.Draw();
@@ -41,50 +54,60 @@ namespace Engine.External
             Map = null;
         }
 
-        public TileMap  SetDisplayLayer(params string[] renderLayerNames)
+        /// <param name="renderLayerNames">in order of behind to top</param>
+        public TileMapRenderer  SetDisplayLayer(params string[] renderLayerNames)
         {
-            if (renderLayerNames.Length <= 0) return this;
-            if(displayLayer.Count > 0) displayLayer.Clear();
-
-            foreach (var layerName in renderLayerNames)
+            int[] result = new int[renderLayerNames.Length];
+            for (int i = 0; i < result.Length; i++)
             {
-                if(TiledUtil.TryFindLayer(Map,layerName,out ITmxLayer foundLayer))
-                {
-                    displayLayer.Add(foundLayer);
-                }
+                var name = renderLayerNames[i];
+                if (Map.TryFindLayer(name, out ITmxLayer layer))
+                    result[i] = Map.Layers.IndexOf(layer);
+                else
+                    throw new Exception($"Can't find \"{name}\" layer");
             }
+            displayLayerIndices = result;
             return this;
         }
 
-        public void OnInspectorGUI()
-        {
-            ImGui.SetNextItemWidth(40);
 
-            if (ImGui.BeginCombo("Tileset",String.Empty))
+
+        const int COLLUM_COUNT = 2;
+        void ICustomInspectorImgui.OnInspectorGUI()
+        {
+
+            if (ImGui.BeginTable($"tilesets###{Entity.ID}", COLLUM_COUNT,ImGuiTableFlags.BordersH))
             {
+                ImGui.TableNextRow();
                 foreach (TmxTileset tileset in Map.Tilesets)
                 {
-                    ImGui.BeginGroup();
-                        ImGui.Image((IntPtr)tileset.Image.Texture.ID, tileset.Image.Texture.Scale()/10f);
-                        ImGui.SameLine();
-                        if (ImGui.Selectable(tileset.Name))
-                        {
-                        }
-                    ImGui.EndGroup();
+                    /// Compact row into group
 
+                    ImGui.TableNextColumn();
+                    var texture = tileset.Image.TextureAtlas.Texture.Value;
+                    ImGui.Image((IntPtr)texture.id, texture.Scale() / 10f);
+                    PopUpTileset(tileset);
 
-                    if (ImGui.IsItemHovered(ImGuiHoveredFlags.DelayShort ))
-                    {
-                        ImGui.BeginTooltip();
-                        ImGui.Image((IntPtr)tileset.Image.Texture.ID, tileset.Image.Texture.Scale());
-                        ImGui.EndTooltip();
-                    }
-                    
+                    ImGui.TableNextColumn();
+                    ImGui.Text($"{tileset.Name}");
                 }
-                ImGui.EndCombo();
+                
             }
+            ImGui.EndTable();
             ImGuiNET.ImGui.GetWindowDrawList().AddCircle(Vector2.Zero,20, (uint)Raylib.ColorToInt(Color.WHITE),50); ;
         }
+
+        static void PopUpTileset(TmxTileset tileset)
+        {
+            if (ImGui.IsItemHovered(ImGuiHoveredFlags.DelayShort))
+            {
+                ImGui.BeginTooltip();
+                var texture = tileset.Image.TextureAtlas.Texture.Value;
+                ImGui.Image((IntPtr)texture.id, texture.Scale());
+                ImGui.EndTooltip();
+            }
+        }
+
 
     }
 

@@ -2,17 +2,19 @@
 // Licensed under the Apache License, Version 2.0
 // http://www.apache.org/licenses/LICENSE-2.0
 #define RAYLIB
+using Engine.Texturepacker;
 using Raylib_cs;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO.Compression;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Xml;
 using System.Xml.Linq;
 
 namespace Engine.TiledSharp
 {
+
     public abstract class TmxDocument
     {
         public string TmxDirectory {get; private set;}
@@ -137,7 +139,7 @@ namespace Engine.TiledSharp
 
     public class TmxImage : IDisposable
     {
-        public rTexture Texture;
+        public TextureAtlas TextureAtlas;
         public string Source {get; private set;}
         public string Format {get; private set;}
         public Stream Data {get; private set;}
@@ -145,7 +147,7 @@ namespace Engine.TiledSharp
         public int? Width {get; private set;}
         public int? Height {get; private set;}
 
-        public TmxImage(XElement xImage, string tmxDir = "")
+        public TmxImage(XElement xImage, string tmxDir = "",int CollumnXCnt = 1,int RowYCnt = 1)
         {
             if (xImage == null) return;
 
@@ -155,12 +157,13 @@ namespace Engine.TiledSharp
             {
                 // Append directory if present
                 Source = Path.Combine(tmxDir, (string)xSource);
-
+           
                 ///If content manager exist, then use it
-                if (Core.Instance != null && Core.Instance.Managers.Contains(ContentManager.Instance))
-                    Texture = ContentManager.Load<rTexture>(Path.GetFileNameWithoutExtension(Source), Source);
-                else
-                    Texture = rTexture.Load(Source);
+                //TODO: Handle if contentmanager not exist or core engine not exist
+                TextureAtlas = ContentManager.Load<TextureAtlas>(Path.GetFileNameWithoutExtension(Source), () =>
+                {
+                    return new TextureAtlas(Source,CollumnXCnt,RowYCnt);
+                });
             }
             else 
             {
@@ -177,11 +180,8 @@ namespace Engine.TiledSharp
 
         public void Dispose()
         {
-            if (Core.Instance.Managers.Contains(ContentManager.Instance))
-                ContentManager.Unload(Path.GetFileNameWithoutExtension(Source));
-            else
-                Texture?.Dispose();
-            Texture = null;
+            ContentManager.Unload<TextureAtlas>(Path.GetFileNameWithoutExtension(Source));
+            TextureAtlas = null;
         }
     }
 

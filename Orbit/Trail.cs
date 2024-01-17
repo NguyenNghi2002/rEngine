@@ -15,7 +15,7 @@ public class Trail : RenderableComponent, IUpdatable
 
     public override void Render()
     {
-        var a = ContentManager.GetOrNull<rTexture>("trail_01");
-        trail?.DrawTrail(a,Color.WHITE);
+        if(ContentManager.TryGet<rTexture>("trail_01",out var a))
+            trail?.DrawTrail(a,Color.WHITE);
     }
 }

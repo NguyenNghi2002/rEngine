@@ -14,12 +14,14 @@ namespace Engine.TiledSharp
 {
     public partial class TmxLayer
     {
-        public TmxLayerTile GetTile(int x, int y)
-            =>Tiles[x + y * Map.Width];
+        public TmxLayerTile? GetTile(int x, int y)
+        {
+            return (x >= 0 && x < Map.Width && y >= 0 && y < Map.Height) ? Tiles[x + y * Map.Width] : null;
+        }
     }
 
     /// <summary>
-    /// Tile layer 
+    /// Tile layer hold miltiple of <see cref="TmxLayerTile"/> objects
     /// </summary>
     public partial class TmxLayer : ITmxLayer
     {
@@ -123,6 +125,9 @@ namespace Engine.TiledSharp
         }
     }
 
+    /// <summary>
+    /// Tile in <see cref="TmxLayer"/>
+    /// </summary>
     public class TmxLayerTile
     {
         // Tile flip bit flags
@@ -130,6 +135,7 @@ namespace Engine.TiledSharp
         const uint FLIPPED_VERTICALLY_FLAG   = 0x40000000;
         const uint FLIPPED_DIAGONALLY_FLAG   = 0x20000000;
 
+        public TmxMap Map;
         public TmxTileset Tileset;
         public int Gid;
 
@@ -200,6 +206,7 @@ namespace Engine.TiledSharp
             // Save GID remainder to int
             Gid = (int)rawGid;
             Tileset = map.GetTilesetFromGid(Gid);
+            Map = map;
         }
     }
 }

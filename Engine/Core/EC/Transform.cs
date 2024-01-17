@@ -247,7 +247,7 @@ namespace Engine
         public Vector2 Position2
         {
             get => Position.ToVec2();
-            set => Position = value.ToVec3() ;
+            set => Position = new Vector3(value,Position.Z);
         }
         public Vector3 Position
         {

@@ -1,8 +1,9 @@
-﻿using Raylib_cs;
+﻿#if false
+using Raylib_cs;
 
 namespace Engine
 {
-    public class rSound : Resource
+    public class rSound : IDisposable
     {
         Sound _sound;
         public AudioStream Stream
@@ -14,7 +15,7 @@ namespace Engine
         {
             _sound = sound;
         }
-        public override void Dispose()
+        public void Dispose()
         {
             Raylib.UnloadSound(_sound);
         }
@@ -22,14 +23,15 @@ namespace Engine
         public static implicit operator Sound(rSound rFont) => rFont._sound;
         public static rSound Load(string filePath)
         {
-            
+
             Insist.IsTrue(Path.HasExtension(filePath), $"{filePath} doesn't have extension");
             var a = Raylib.LoadSound(filePath);
-            return new rSound( a);
+            return new rSound(a);
         }
 
 
     }
 
 
-}
+} 
+#endif

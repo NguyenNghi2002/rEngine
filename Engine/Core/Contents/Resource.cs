@@ -1,9 +1,11 @@
 ﻿namespace Engine
 {
-    public abstract class  Resource : IDisposable
+#if false
+    public abstract class Resource : IDisposable
     {
         public virtual void Dispose() { }
-    }
+    } 
+#endif
 
 
 }
