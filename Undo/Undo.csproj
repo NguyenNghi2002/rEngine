@@ -15,7 +15,6 @@
     <Compile Include="Grid.cs" />
     <Compile Include="GridObject.cs" />
     <Compile Include="MoveCommand.cs" />
-    <Compile Include="Pushable.cs" />
     <Compile Include="TileMapSnappable.cs" />
     <Compile Include="Program.cs" />
   </ItemGroup>
@@ -29,6 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="bin\Debug\net6.0\.contents\fonts\" />
     <Folder Include="bin\Debug\net6.0\.contents\tilemaps\" />
   </ItemGroup>
 

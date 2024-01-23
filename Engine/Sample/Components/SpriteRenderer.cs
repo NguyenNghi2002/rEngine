@@ -147,6 +147,13 @@ namespace Engine
             _tintColorNormal = Raylib.ColorNormalize(tintColor);
             return this;
         }
+        public SpriteRenderer SetAlpha(float alpha)
+        {
+            _tintColorNormal.W = alpha;
+            _tintColor.a = (byte)(alpha * 255);
+            return this;
+        }
+
 
         /// <summary>
         /// 
@@ -232,7 +239,6 @@ namespace Engine
 #if true
         void ICustomInspectorImgui.OnInspectorGUI()
         {
-            
             var flags = ImGuiNET.ImGuiColorEditFlags.AlphaBar
                 | ImGuiNET.ImGuiColorEditFlags.AlphaPreviewHalf
                 | ImGuiNET.ImGuiColorEditFlags.DefaultOptions;
@@ -245,12 +251,15 @@ namespace Engine
                 }
                 ImGuiNET.ImGui.Separator();
                 ImGuiNET.ImGui.TextColored(_tintColorNormal, "Texture");
-                ImGuiNET.ImGui.Image((IntPtr)txt.id, txt.Scale(), _sprite.SourceRec.TopLeft() / txt.Scale(), _sprite.SourceRec.BotRight() / txt.Scale(), _tintColorNormal);
+                ImGuiNET.ImGui.Image((IntPtr)txt.id, _sprite.SourceScale, 
+                    _sprite.SourceRec.TopLeft() / txt.Scale(), 
+                    _sprite.SourceRec.BotRight() / txt.Scale(), 
+                    _tintColorNormal);
                 ImGuiNET.ImGui.SameLine();
 
                 
-                ImGuiNET.ImGui.Text(txt.height.ToString());
-                ImGuiNET.ImGui.Text(txt.width.ToString());
+                ImGuiNET.ImGui.Text(_sprite.SourceHeight.ToString());
+                ImGuiNET.ImGui.Text(_sprite.SourceWidth.ToString());
             }
         } 
 #endif

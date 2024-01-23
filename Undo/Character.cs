@@ -1,90 +1,38 @@
 ﻿using Engine;
+using Engine.UI;
 using Raylib_cs;
+using System.Collections;
+using System.Diagnostics;
 using System.Net;
 using System.Numerics;
 
 namespace Undo
 {
+    /// <summary>
+    /// Require GridObject
+    /// </summary>
     public class Character : Component
     {
+        public string SocketID;
+        public int Layer = 0;
         public bool Undoable = true;
         public bool Pushable = true;
-        struct CellMoveCommand : CommandSystem.ICommand
-        {
-            readonly   GridObject _gridObj;
-            readonly Character _character;
-            int _dx, _dy;
-            public CellMoveCommand(Character character, GridObject gridObject, int dx, int dy)
-            {
-                _character = character;
-                this._gridObj = gridObject;
-                this._dx = dx;
-                this._dy = dy;
-            }
-            void CommandSystem.ICommand.Execute()
-            {
-                ExecuteMove(_dx, _dy);
-            }
-
-            void CommandSystem.ICommand.Redo()
-            {
-                ExecuteMove(_dx, _dy);
-            }
-
-            void CommandSystem.ICommand.Undo()
-            {
-                ExecuteMove(-_dx, -_dy);
-            }
-
-            void ExecuteMove(int dx, int dy)
-            {
-                if (!_character.IsNextCellWalkable(dx, dy)) return;
-
-                FloorCell nextFloorCell = _gridObj.Grid.GetCell(_gridObj.GetLocation() + new VectorInt2(dx,dy));
-                var gridObj = _gridObj;
-                var halfCellSize = _gridObj.Grid.CellSize / 2f;
-
-
-                //Check pushable in next
-                var objs = nextFloorCell.Objects.Where((cellGridObj) =>
-                cellGridObj.Entity.TryGetComponent<Pushable>(out _)
-                && cellGridObj != gridObj
-                );
-
-                //relocate object cell
-                foreach (GridObject obj in objs)
-                {
-                    obj.Entity.TryGetComponent<CommandSystem>(out var commander);
-                    obj.Entity.TryGetComponent<Character>(out var character);
-                    var moveIntX = dx == 0 ? 0 : MathF.Sign(dx);
-                    var moveIntY = dy == 0 ? 0 : MathF.Sign(dy);
-                    //character.Move(moveIntX,moveIntY);
-                    commander.ExecuteCommand(new CellMoveCommand(character,obj,moveIntX,moveIntY));
-                }
-                
-                if(nextFloorCell.Objects.Count == 0)
-                {
-                    _gridObj.Shift(dx, dy);
-                    _gridObj.SnapTransform(halfCellSize);
-                }
-                else
-                {
-                    _character.Entity.TryGetComponent<CommandSystem>(out var command);
-                }
-
-            }
-        }
 
         protected GameMananger _gm;
         protected GridObject _gridObj;
+        public event Action<Entity>? OnMoved;
 
         public override void OnAddedToEntity()
         {
             Scene.TryFindComponent(out _gm);
             Entity.TryGetComponent(out _gridObj);
+            Debug.Assert(_gm != null);
+            Debug.Assert(_gridObj != null,$"{this} component require {typeof(GridObject) } ");
 
             _gridObj.SnapLocation(Transform.LocalPosition2);
             _gridObj.SnapTransform(_gridObj.Grid.CellSize / 2f);
+
+            OnMoved += _gm.OnCharacterMoved;
         }
 
         protected bool IsNextCellWalkable(int dx, int dy)
@@ -103,24 +51,11 @@ namespace Undo
                 return false;
             return _gridObj.Grid.GetCell(nextLoc.X, nextLoc.Y).Objects.Count == 0;
         }
-        protected void MoveUp()
+     
+        internal void ControlMovement(int dx, int dy)
         {
-            Move(0,-1);
-        }
-        protected void MoveDown()
-        {
-            Move(0,1);
-        }
-        protected void MoveLeft()
-        {
-            Move(-1,0);
-        }
-        protected void MoveRight()
-        {
-            Move(1,0);
-        }
-        internal void Move(int dx, int dy)
-            => MoveRecursive(dx,dy, true);
+            MoveRecursive(dx,dy, true);
+        } 
         internal bool MoveRecursive(int dx,int dy,bool allowSaveHistory)
         {
             //Check if next cell is floor
@@ -131,88 +66,104 @@ namespace Undo
 
             var nextCell = _gridObj.Grid.GetCell(_gridObj.GetLocation() + new VectorInt2(dx, dy));
 
-            //Check if next cell is contain any non pushable objects
-            // , return FALSE
-            if (nextCell.Objects.Any(o => !o.Entity.GetComponent<Character>().Pushable))
-                return false;
-
-            ///Loop through pushable objects
-            foreach (var obj in nextCell.Objects)
+            //
+            foreach (Character? character in nextCell.Objects.Select(o=> o.Entity.GetComponent<Character>()))
             {
-                int dxObj = dx == 0 ? 0 : MathF.Sign(dx) * dx / dx;
-                int dyObj = dy == 0 ? 0 : MathF.Sign(dy) * dy / dy;
-                if (!obj.Entity.GetComponent<Character>().MoveRecursive(dxObj, dyObj, allowSaveHistory))
+                if (character.Layer != this.Layer) continue;
+
+                if (!character.Pushable) return false;
+
+                if (!character.MoveRecursive(MathF.Sign(dx), MathF.Sign(dy), allowSaveHistory))
                     return false;
             }
 
-            if((Undoable && allowSaveHistory) )
+            if(Undoable && allowSaveHistory)
             {
                 _gm.RequestMovement(this, new(dx, dy));
                 return true;
             }
             else
             {
+
+                ///Execute Movement
                 _gridObj.Shift(dx, dy);
                 _gridObj.SnapTransform(_gridObj.Grid.CellSize / 2f);
+
+                var sprite = Entity.GetComponentInChilds<SpriteRenderer>();
+                if (sprite != null)
+                {
+                    Core.StartCoroutine(AnimateMove(dx, dy, sprite.Entity,tweening,0.3f));
+                }
+
+                OnMoved?.Invoke(this.Entity);
                 return true;
             }
 
         }
 
+        static Queue<IEnumerator> tweening = new Queue<IEnumerator>();
+        public IEnumerator AnimateMove(int dx,int dy ,Entity en,Queue<IEnumerator> enumerators,float duration )
+        {
+            float elapse = 0;
+            var offX = dx * 16;
+            var offY = dy * 16;
 
+            float x = 0, y = 0;
+            while (elapse < 1f)
+            {
+                elapse += Time.DeltaTime;
+
+                x = Easings.EaseExpoOut(elapse,-offX,offX, duration);
+                y = Easings.EaseExpoOut(elapse, -offY,offY, duration);
+                en.Transform.LocalPosition2 = new Vector2(x,y );
+                
+                yield return null;
+            }
+
+
+        }
 
     }
 
-    public class Player : Character,IUpdatable
+    /// <summary>
+    /// Controllable character
+    /// </summary>
+    public class Player : Character
     {
-        int IUpdatable.UpdateOrder { get; set; }
-        public KeyboardKey 
-            Left    = KeyboardKey.KEY_LEFT  ,
-            Right   = KeyboardKey.KEY_RIGHT ,
-            Up      = KeyboardKey.KEY_UP    ,
-            Down    = KeyboardKey.KEY_DOWN  
-            ;
-
-
-        void IUpdatable.Update()
+        public override void OnAddedToEntity()
         {
-            if (Input.IsKeyPressed(Left))
-            {
-                MoveLeft();
-                _gm.ExecuteCommand();
-            }
-            if (Input.IsKeyPressed(Right))
-            {
-                MoveRight();
-                _gm.ExecuteCommand();
+            base.OnAddedToEntity();
 
-            }
-            if (Input.IsKeyPressed(Up))
+            if(Scene.TryFindComponent(out InputManager input))
             {
-                MoveUp();
-                _gm.ExecuteCommand();
-            }
-            if (Input.IsKeyPressed(Down)) 
-            { 
-                MoveDown();
-                _gm.ExecuteCommand();
-            }
-
-            if (Input.IsKeyPressed(KeyboardKey.KEY_Z))
-            {
-                _gm.UndoCommand();
-            }
-
-            if (Input.IsKeyPressed(KeyboardKey.KEY_X))
-            {
-                _gm.RedoCommand();
+                input.OnLeft += ()=> ControlMovement(-1, 0);
+                input.OnRight += ()=> ControlMovement(1, 0);
+                input.OnUp += ()=> ControlMovement(0, -1);
+                input.OnDown += ()=> ControlMovement(0, 1);
             }
         }
+    }
 
-        
+    public class Indicator: Character
+    {
+        public override void OnAddedToEntity()
+        {
+            base.OnAddedToEntity();
 
+            _gm.indicators.Add(this);
+        }
+        public override void OnRemovedFromEntity()
+        {
+            _gm.indicators.Remove(this);
 
+            base.OnRemovedFromEntity();
+        }
 
+        public bool IsIndicated()
+        {
+            var cell = _gridObj.Grid.GetCell(_gridObj.GetLocation());
+            return cell.Objects.Any(o => o != this._gridObj && o.Entity.GetComponent<Character>().SocketID == this.SocketID);
+        }
     }
 
 }

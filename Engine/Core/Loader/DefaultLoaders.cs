@@ -6,6 +6,18 @@ using System.Diagnostics;
 
 namespace Engine
 {
+    public class FontLoader : IResourceHandler
+    {
+        public object Load(string path)
+        {
+            return Raylib.LoadFont(path);
+        }
+        public void Unload(object resource)
+        {
+            if (resource is Font texture2D)
+                Raylib.UnloadFont(texture2D);
+        }
+    }
     public class Texture2DLoader : IResourceHandler
     {
         public object Load(string path)

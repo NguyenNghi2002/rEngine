@@ -7,9 +7,9 @@ namespace Engine
     public class FadeTransition : Transition
     {
         Color OverlayColor = Color.WHITE;
-        float FadeOutDuration = 1f;
-        float FadeInDuration = 1f;
-        float DelayBeforeFadeIn = 0.1f;
+        public float FadeOutDuration = 1f;
+        public float FadeInDuration = 1f;
+        public float HoldDuration = 0.1f; // Hold
 
 
         Color _color;
@@ -33,7 +33,7 @@ namespace Engine
 
             Console.WriteLine("load new scene");
 
-            yield return new WaitForSecond(DelayBeforeFadeIn);
+            yield return new WaitForSecond(HoldDuration);
 
             elapse = 0f;
             while (elapse < FadeInDuration)

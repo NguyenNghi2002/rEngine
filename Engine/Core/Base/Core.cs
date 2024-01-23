@@ -350,8 +350,10 @@ namespace Engine
             }
             else
             {
+                ///Render scene
                 _scene.FinalRender();
 
+                ///Render Transition on top of Scene
                 if(_sceneTransition != null )
                 {
                     if(_scene != null && !_sceneTransition.IsPlaying)
@@ -397,6 +399,8 @@ namespace Engine
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T StartTransition<T>(T transition,bool allowMultiple = false)where T : Transition
         {
+            ///If Transition is playing, and new transition is request
+            /// then new transition will be cancle
             if (!allowMultiple && Core.Instance._sceneTransition != null) return transition;
 
             Insist.IsNotNull(transition,"Transition can not be NULL");

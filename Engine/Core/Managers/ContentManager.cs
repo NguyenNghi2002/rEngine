@@ -37,10 +37,11 @@ namespace Engine
 
         void AddDefaultLoaders()
         {
-            ResourceHandlers.Add(typeof(Texture2D)    , new Texture2DLoader());
-            ResourceHandlers.Add(typeof(Sound)      , new SoundLoader());
-            ResourceHandlers.Add(typeof(Skin)        , new SkinLoader()); // Incompleted
-            ResourceHandlers.Add(typeof(TextureAtlas), new TextureAtlasLoader());
+            ResourceHandlers.Add(typeof(Font)           , new FontLoader());
+            ResourceHandlers.Add(typeof(Texture2D)      , new Texture2DLoader());
+            ResourceHandlers.Add(typeof(Sound)          , new SoundLoader());
+            ResourceHandlers.Add(typeof(Skin)           , new SkinLoader()); // Incompleted
+            ResourceHandlers.Add(typeof(TextureAtlas)   , new TextureAtlasLoader());
         }
 
         /// <summary>
@@ -82,7 +83,8 @@ namespace Engine
             {
                 var type = typeof(T);
                 if (Instance.ResourceHandlers.TryGetValue(type,out IResourceHandler? handler))
-                    handler.Unload(type);
+                    handler.Unload(content);
+                Instance.Resources[name].Remove(typeof(T));
                 return true;
             }
             return false;
@@ -92,11 +94,12 @@ namespace Engine
         {
             //final content
             object content = null;
-            var nameDict = Instance.Resources;
 
             //Check if the name already exist
             if (Instance.Resources.TryGetValue(resourceName, out Dictionary<Type,object>? contentDic))
             {
+                Debugging.Log($"Found {resourceName}", Debugging.LogLevel.System);
+
                 //Check if the type already exist
                 if (contentDic.TryGetValue(typeof(T), out content))
                 {
@@ -107,10 +110,13 @@ namespace Engine
 
                     content = customloadhandler.Invoke();
                     contentDic.Add(typeof(T),content);
+                    Debugging.Log($"Assign : {typeof(T)} -> {resourceName}", Debugging.LogLevel.System);
                 }
             }
             else
             {
+                Debugging.Log($"Can't Find {resourceName}", Debugging.LogLevel.System);
+
                 /// custume invoke could have sub invoke in it so becareful
                 content = customloadhandler.Invoke();
 
@@ -120,12 +126,12 @@ namespace Engine
                     /// If new name was added, then add content to fresh new dictionary
                     contentDictionary.Add(typeof(T),content);
                 }
-                else
+                else /// This happen when custom load have sub-custom load and it can cause error thrown 
                 {
+                    Debugging.Log($"Resource {resourceName} type of {typeof(T)} is already loaded", Debugging.LogLevel.Comment);
                     /// If name was added, that's mean name has dictionary in it already,
                     /// just add new type / content
                     Instance.Resources[resourceName].Add(typeof(T),content);
-                    //Instance.Resources[resourceName].Clear();
                 }
             }
             return (T)content;
@@ -137,7 +143,7 @@ namespace Engine
         /// <param name="resourceName">name your resource</param>
         /// <param name="path">file path</param>
         /// <returns>loaded <typeparamref name="T"/></returns>
-        public static T Load<T>(string resourceName, string path, bool ignoreWarning = false) 
+        public static T Load<T>(string resourceName, string path) 
         {
             return Load<T>(resourceName, () =>
             {

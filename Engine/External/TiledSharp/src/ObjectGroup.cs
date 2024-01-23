@@ -78,7 +78,7 @@ namespace Engine.TiledSharp
         public int Id {get; private set;}
         public string Name {get; private set;}
         public TmxObjectType ObjectType {get; private set;}
-        public string Type {get; private set;}
+        public string Class {get; private set;}
         public double X {get; private set;}
         public double Y {get; private set;}
         public double Width {get; private set;}
@@ -91,7 +91,6 @@ namespace Engine.TiledSharp
 
         public Collection<TmxObjectPoint> Points {get; private set;}
         public PropertyDict Properties {get; private set;}
-
         public TmxObject(TmxMap map,XElement xObject)
         {
             Id = (int?)xObject.Attribute("id") ?? 0;
@@ -100,10 +99,9 @@ namespace Engine.TiledSharp
             Y = (double)xObject.Attribute("y");
             Width = (double?)xObject.Attribute("width") ?? 0.0;
             Height = (double?)xObject.Attribute("height") ?? 0.0;
-            Type = (string)xObject.Attribute("type") ?? String.Empty;
+            Class = (string)xObject.Attribute("class") ?? String.Empty;
             Visible = (bool?)xObject.Attribute("visible") ?? true;
             Rotation = (double?)xObject.Attribute("rotation") ?? 0.0;
-
             // Assess object type and assign appropriate content
             var xGid = xObject.Attribute("gid");
             var xEllipse = xObject.Element("ellipse");

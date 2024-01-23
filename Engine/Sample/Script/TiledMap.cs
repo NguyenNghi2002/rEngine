@@ -50,7 +50,6 @@ namespace Engine
         }
         public override void OnRemovedFromEntity()
         {
-            Map.Unload();
             Map = null;
         }
 
@@ -75,7 +74,6 @@ namespace Engine
         const int COLLUM_COUNT = 2;
         void ICustomInspectorImgui.OnInspectorGUI()
         {
-
             if (ImGui.BeginTable($"tilesets###{Entity.ID}", COLLUM_COUNT,ImGuiTableFlags.BordersH))
             {
                 ImGui.TableNextRow();
@@ -99,6 +97,7 @@ namespace Engine
 
         static void PopUpTileset(TmxTileset tileset)
         {
+            
             if (ImGui.IsItemHovered(ImGuiHoveredFlags.DelayShort))
             {
                 ImGui.BeginTooltip();

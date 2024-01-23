@@ -235,7 +235,7 @@ namespace Engine
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T GetComponentInHirachy<T>() where T : Component
+        public T? GetComponentInHirachy<T>() where T : Component
         {
             if (!TryGetComponent<T>(out var result))
                 result = GetComponentInChilds<T>();
@@ -248,7 +248,7 @@ namespace Engine
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T GetComponentInChilds<T>() where T : Component
+        public T? GetComponentInChilds<T>() where T : Component
         {
             if (!Transform.HasChilds) return null;
 

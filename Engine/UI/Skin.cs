@@ -17,7 +17,7 @@ namespace Engine.UI
         /// creates a default Skin that can be used for quick mockups. Includes button, textu button, checkbox, progress bar and slider styles.
         /// </summary>
         /// <returns>The default skin.</returns>
-        public static Skin CreateDefaultSkin()
+        public static Skin CreateDefaultSkin() 
         {
             var skin = new Skin();
 
@@ -66,13 +66,13 @@ namespace Engine.UI
 
             var textButtonStyle = new TextButtonStyle
             {
-                Up = new PrimitiveDrawable(buttonColor, 6, 2),
+                Up = new PrimitiveDrawable(buttonColor),
                 Over = new PrimitiveDrawable(buttonOver),
                 Down = new PrimitiveDrawable(buttonDown),
                 OverFontColor = overFontColor,
                 DownFontColor = downFontColor,
-                PressedOffsetX = 1,
-                PressedOffsetY = 1
+                PressedOffsetX = 0,
+                PressedOffsetY = 0,
             };
             skin.Add("default", textButtonStyle);
 

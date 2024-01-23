@@ -1,5 +1,6 @@
 ﻿using Engine.Renderering;
 using Raylib_cs;
+using System.Diagnostics;
 using System.Numerics;
 
 namespace Engine.SceneManager
@@ -28,7 +29,9 @@ namespace Engine.SceneManager
         public TextureFilter Filter 
         { set
             {
-                Raylib.SetTextureFilter(_sceneRenderTxt.texture,value);
+                Debug.Assert(_sceneRenderTexture.id != 0,"scene render texture have not created yet");
+                Debug.Assert(FinalRenderTexture.id != 0,"final scene render texture have not created yet");
+                Raylib.SetTextureFilter(_sceneRenderTexture.texture,value);
                 Raylib.SetTextureFilter(FinalRenderTexture.texture,value);
                 //_sceneRenderTxt.texture. Filter = value;
                 //FinalRenderTexture.Filter = value;
@@ -50,7 +53,7 @@ namespace Engine.SceneManager
         public EntityList SceneEntitiesList { set; get; } //Added in constructor
 
         /** RENDER INFOS **/
-        RenderTexture2D _sceneRenderTxt;
+        RenderTexture2D _sceneRenderTexture;
         protected RenderTexture2D FinalRenderTexture { private set; get; }
         Rectangle _finalRectangle;
 
@@ -112,7 +115,7 @@ namespace Engine.SceneManager
              
             /** RENDERER  **/
             FinalRenderTexture = Raylib.LoadRenderTexture(screenWidth, screenHeight);
-            _sceneRenderTxt = Raylib.LoadRenderTexture(screenWidth, screenHeight);
+            _sceneRenderTexture = Raylib.LoadRenderTexture(screenWidth, screenHeight);
 
             Filter = TextureFilter.TEXTURE_FILTER_BILINEAR;
             //FinalRenderTexture.SetFilter(TextureFilter.TEXTURE_FILTER_BILINEAR);
@@ -146,7 +149,7 @@ namespace Engine.SceneManager
             _sceneComponents.Clear();
 
             Raylib.UnloadRenderTexture(FinalRenderTexture);
-            Raylib.UnloadRenderTexture(_sceneRenderTxt);
+            Raylib.UnloadRenderTexture(_sceneRenderTexture);
 
             SceneEntitiesList = null;
 

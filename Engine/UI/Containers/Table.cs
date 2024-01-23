@@ -1540,7 +1540,7 @@ namespace Engine.UI
 		{
 			if (_debugRects != null)
 			{
-				foreach (var d in _debugRects)
+				foreach (DebugRectangleF d in _debugRects)
                 {
 					var rec = new Rectangle(x + d.Rect.x, y + d.Rect.y,d.Rect.width,d.Rect.height);
 					Raylib.DrawRectangleLinesEx(rec,2,d.Color);

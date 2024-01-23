@@ -197,7 +197,6 @@ namespace Engine.TiledSharp
             throw new Exception($"tile gid {gid} was not found in any tile set");
 
         }
-
         public void TilesetLocationFromGid(int gid,out int x, out int y)
         {
             Debug.Assert(gid > 0,"gid should be larger than 0") ;
