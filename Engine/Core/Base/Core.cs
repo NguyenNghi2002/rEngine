@@ -312,11 +312,15 @@ namespace Engine
                 _scene.EarlyUpdate();
                 if(_queueScene != null)
                 {
-                    _scene.End();
+                    if(!_scene.NoEnd) 
+                        _scene.End();
+
                     _scene = _queueScene;
                     _queueScene = null;
                     GC.Collect();
-                    _scene.Begin();
+
+                    if(!_scene.NoBegin) 
+                        _scene.Begin();
                     // Scene change event
                 }
 

@@ -105,17 +105,17 @@ namespace Engine.UI
 
 		public CheckBoxStyle()
 		{
-			Font = rFont.Default;
+			Font = Raylib.GetFontDefault();
 			CheckboxOff = new PrimitiveDrawable(20,20,UIDefault.BaseUp,UIDefault.OutlineUp);
 			CheckboxOn = new PrimitiveDrawable (20,20,UIDefault.BaseDown,UIDefault.OutlineDown);
 		}
 
 
-		public CheckBoxStyle(IDrawable checkboxOff, IDrawable checkboxOn, rFont? font, Color fontColor)
+		public CheckBoxStyle(IDrawable checkboxOff, IDrawable checkboxOn, Font? font, Color fontColor)
 		{
 			CheckboxOff = checkboxOff;
 			CheckboxOn = checkboxOn;
-			Font = font ?? rFont.Default;
+			Font = font ?? Raylib.GetFontDefault();
 			FontColor = fontColor;
 		}
 	}

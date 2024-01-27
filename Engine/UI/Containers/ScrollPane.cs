@@ -480,7 +480,6 @@ namespace Engine.UI
             ResetFade();
             var scrollDirectionMultiplier = _useNaturalScrolling ? -1 : 1;
             
-            Console.WriteLine(Input.MouseWheelDelta);
             if (_scrollY)
                 SetScrollY(_amountY + Input.MouseWheelDelta * _scrollSpeed * scrollDirectionMultiplier);
             else if (_scrollX)
@@ -1065,7 +1064,7 @@ namespace Engine.UI
         }
 
 
-        public override Element Hit(Vector2 point)
+        public override Element Hit(Vector2 point) 
         {
             // first we do a bounds check, then check our x and y scroll bars
             if (point.X < 0 || point.X >= GetWidth() || point.Y < 0 || point.Y >= GetHeight())

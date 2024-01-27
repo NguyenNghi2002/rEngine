@@ -65,6 +65,7 @@ namespace Engine
 
         public void Unload(object resource)
         {
+
             (resource as TextureAtlas)?.Dispose();
         }
     }

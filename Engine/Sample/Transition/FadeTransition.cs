@@ -7,8 +7,8 @@ namespace Engine
     public class FadeTransition : Transition
     {
         Color OverlayColor = Color.WHITE;
-        public float FadeOutDuration = 1f;
-        public float FadeInDuration = 1f;
+        public float FadeOutDuration = 0.4f;
+        public float FadeInDuration = 0.4f;
         public float HoldDuration = 0.1f; // Hold
 
 
@@ -18,6 +18,7 @@ namespace Engine
 
         public override IEnumerator OnBegin()
         {
+            #region Onverlay
             var elapse = 0f;
             while (elapse < FadeOutDuration)
             {
@@ -26,8 +27,8 @@ namespace Engine
                 Console.WriteLine(elapse);
                 yield return null;
             }
-            Console.WriteLine("Faded   out");
-            OnFadedOut?.Invoke();
+            OnFadedOut?.Invoke(); 
+            #endregion
 
             yield return Core.StartCoroutine(LoadNewScene());
 
@@ -35,6 +36,7 @@ namespace Engine
 
             yield return new WaitForSecond(HoldDuration);
 
+            #region overlay
             elapse = 0f;
             while (elapse < FadeInDuration)
             {
@@ -42,7 +44,7 @@ namespace Engine
                 _color = Raylib.Fade(OverlayColor, Raymath.Lerp(1f, 0f, elapse / FadeOutDuration));
                 yield return null;
             }
-            Console.WriteLine("Faded   in");
+            #endregion
 
             TransitionCompleted();
             Console.WriteLine("COMPLETED TRANSITION");

@@ -55,7 +55,7 @@ namespace Engine.Timer
                     _isDone = true;
             }
 
-            _elapseTime += Raylib.GetFrameTime();
+            _elapseTime += Time.DeltaTime;
 
             return _isDone;
         }

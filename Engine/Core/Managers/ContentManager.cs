@@ -1,5 +1,6 @@
 ﻿#define Singleton
 using Engine.Texturepacker;
+using Engine.TiledSharp;
 using Engine.UI;
 using Raylib_cs;
 using System.Reflection.Metadata.Ecma335;
@@ -77,18 +78,66 @@ namespace Engine
             Instance.Resources.Clear();    
             //TODO: This should clear all contents cause memory leak
         }
+
+        /// <summary>
+        /// Remove content from memory and Unload it if it have handler
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static bool Unload<T>(string name)
         {
             if (TryGet<T>(name,out T? content))
             {
                 var type = typeof(T);
-                if (Instance.ResourceHandlers.TryGetValue(type,out IResourceHandler? handler))
+                if (Instance.ResourceHandlers.TryGetValue(type, out IResourceHandler? handler))
                     handler.Unload(content);
+                else
+                    Debugging.Log($"{name} typeof {typeof(T)} doesn't have handler");
                 Instance.Resources[name].Remove(typeof(T));
+
+                ///If dictionary have no type, then remove
+                if (Instance.Resources[name].Count == 0)
+                    Instance.Resources.Remove(name);
+
                 return true;
             }
             return false;
         }
+#if false
+        public static bool Unload<T>(T content)
+        {
+            foreach (var resourceKeyPair in Instance.Resources)
+            {
+                var name = resourceKeyPair.Key;
+                var resourceDictionary = resourceKeyPair.Value;
+                if (resourceDictionary.ContainsValue(content))
+                {
+                    resourceDictionary[typeof(T)]
+                    return true;
+                }
+            }
+            return false;
+        } 
+#endif
+
+        public static bool TryGetName<T>(T content,out string foundName)
+        {
+            foreach (var resourceKeyPair in Instance.Resources)
+            {
+                var name = resourceKeyPair.Key;
+                var resourceDictionary =  resourceKeyPair.Value;
+                if (resourceDictionary.ContainsValue(content))
+                {
+                    foundName = name;
+                    return true;
+                }
+            }
+            foundName = string.Empty;
+            return false;
+        }
+
+
 
         public static T Load<T>(string resourceName, Func<T> customloadhandler)
         {
@@ -187,6 +236,8 @@ namespace Engine
 
             return false;
         }
+
+
 
 #else
         public Resource this[string name] => resources[name];

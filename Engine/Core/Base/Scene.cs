@@ -26,6 +26,8 @@ namespace Engine.SceneManager
         public Color FinalClearColor = Color.BLANK;
         public Color ClearColor;
         public DesignScaling Scaling = DesignScaling.LetterBox;
+        public bool NoEnd = false;
+        public bool NoBegin = false;
         public TextureFilter Filter 
         { set
             {
@@ -139,18 +141,20 @@ namespace Engine.SceneManager
             foreach (var renderer in Renderers)
                 renderer.Unload();
 
-            SceneEntitiesList.Clear();
 
             Renderers.Clear();
             Updates.Clear();
             FixedUpdates.Clear();
 
+
             _sceneComponents.ForEach((c) => c.OnRemoveFromScene());
             _sceneComponents.Clear();
+
 
             Raylib.UnloadRenderTexture(FinalRenderTexture);
             Raylib.UnloadRenderTexture(_sceneRenderTexture);
 
+            SceneEntitiesList.Clear();
             SceneEntitiesList = null;
 
             OnUnload();

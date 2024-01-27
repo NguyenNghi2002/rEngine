@@ -70,10 +70,8 @@ namespace Engine.UI
 		}
 
 
-#if false
         public Label(string text, Skin skin, string styleName = null) : this(text, skin.Get<LabelStyle>(styleName))
         { } 
-#endif
 
 
         public Label(string text, BitmapFont font, Color fontColor) : this(text, new LabelStyle(font, fontColor))
@@ -288,7 +286,7 @@ namespace Engine.UI
 
 			//TODO Truncate 
 			var textScale = Raylib.MeasureTextEx(_style.Font, _wrappedString, _style.FontScale,_style.Spacing);
-			_prefSize = textScale;
+			_prefSize = new Vector2(textScale.X,textScale.Y);
 				//_style.Font.MeasureString(_wrappedString) * new Vector2(_style.FontScaleX, _style.FontScaleY);
 		}
 
@@ -340,7 +338,7 @@ namespace Engine.UI
 			else
 			{
 				textWidth = width;
-				textHeight = _style.FontScale;// _style.Font.LineHeight * _style.FontScaleY;
+				textHeight = _style.FontScale ;// _style.Font.LineHeight * _style.FontScaleY;
 			}
 			if ((labelAlign & AlignInternal.Bottom) != 0)
 			{

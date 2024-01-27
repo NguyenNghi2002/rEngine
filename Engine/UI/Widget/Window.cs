@@ -49,12 +49,9 @@ namespace Engine.UI
 			height = 150;
 		}
 
-#if false
 
         public Window(string title, Skin skin, string styleName = null) : this(title, skin.Get<WindowStyle>(styleName))
         { }
-
-#endif
 
         #region IInputListener
 
@@ -372,6 +369,7 @@ namespace Engine.UI
 
 
 		public Label GetTitleLabel() => titleLabel;
+
 	}
 
 

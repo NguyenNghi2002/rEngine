@@ -59,7 +59,8 @@ namespace Engine.Texturepacker
         {
             if(Texture != null)
             {
-                Raylib.UnloadTexture(Texture.Value);
+                if(ContentManager.TryGetName(Texture, out string textureName))
+                    ContentManager.Unload<Texture2D>(textureName);
                 Texture = null;
             }
         }

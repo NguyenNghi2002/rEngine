@@ -214,6 +214,7 @@ namespace Engine.TiledSharp
 
             foreach (var imageLayer in ImageLayers)
                 imageLayer.Image.Dispose();
+
         }
     }
 

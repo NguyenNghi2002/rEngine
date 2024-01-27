@@ -10,15 +10,15 @@ namespace Engine.UI
 		TextButtonStyle style;
 
 
-		public TextButton(string text, TextButtonStyle style) : base(style)
-		{
-			SetStyle(style);
-			label = new Label(text, style.Font, style.FontColor, style.Font.Size);
-			label.SetAlignment(UI.Align.Center);
+        public TextButton(string text, TextButtonStyle buttonStyle) : base(buttonStyle)
+        {
+            SetStyle(buttonStyle);
+            label = new Label(text, buttonStyle.Font, buttonStyle.FontColor, buttonStyle.FontScale);
+            label.SetAlignment(UI.Align.Center);
 
-			Add(label).Expand().Fill();
-			SetSize(PreferredWidth, PreferredHeight);
-		}
+            Add(label).Expand().Fill();
+            SetSize(PreferredWidth, PreferredHeight);
+        } 
 
 
         public TextButton(string text, Skin skin, string styleName = null) : this(text,
@@ -39,7 +39,7 @@ namespace Engine.UI
 				var labelStyle = label.GetStyle();
 				labelStyle.Font = textButtonStyle.Font;
 				labelStyle.FontColor = textButtonStyle.FontColor;
-				labelStyle.FontScale = textButtonStyle.Font.Size;
+				labelStyle.FontScale = textButtonStyle.FontScale;
 				label.SetStyle(labelStyle);
 			}
 		}
@@ -120,29 +120,25 @@ namespace Engine.UI
 	/// </summary>
 	public class TextButtonStyle : ButtonStyle
 	{
-		public rFont Font;
+		public Font Font;
 
 		/** Optional. */
+		public float FontScale = 10;
 		public Color FontColor = Color.WHITE;
 		public Color? DownFontColor, OverFontColor, CheckedFontColor, CheckedOverFontColor, DisabledFontColor;
 
 
-		public TextButtonStyle()
+        public TextButtonStyle()
 		{
-			Font = rFont.Default;
+			Font = Raylib.GetFontDefault();
 		}
 
 
-		public TextButtonStyle(IDrawable up, IDrawable down, IDrawable over, rFont font) : base(up, down, over)
+		public TextButtonStyle(IDrawable up, IDrawable down, IDrawable over, Font? font) : base(up, down, over)
 		{
-			Font = font ?? rFont.Default;
+			Font = font ?? Raylib.GetFontDefault();
 		}
 
-
-		public TextButtonStyle(IDrawable up, IDrawable down, IDrawable over) : this(up, down, over,
-			rFont.Default)
-		{
-		}
 
         #region Factory
         public static TextButtonStyle CreateRaylib()

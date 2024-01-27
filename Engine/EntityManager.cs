@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Reflection;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.CompilerServices;
 using static ImGuiNET.ImGui;
 public interface ICustomInspectorImgui
 {
@@ -36,7 +37,6 @@ public class ImguiEntityManager : GlobalManager
 {
     ImGuiIOPtr _io;
     internal ImGuiStylePtr _style;
-
     public ImguiEntityManager()
     {
         rlImGui.Setup(true);
@@ -81,6 +81,7 @@ public class ImguiEntityManager : GlobalManager
     }
     public static class HirachyWindow
     {
+        static bool needUpdateSelection = false;
         static List<Entity> selectedEntities = new List<Entity>();
         const string WindowTitle = "Entities Hirachy";
         static bool showInspector = false;
@@ -95,32 +96,34 @@ public class ImguiEntityManager : GlobalManager
                 var rootEntities = Core.Scene.SceneEntitiesList.Where(e => e.Transform.Parent == null);
                 AddEntitiesListWidget(rootEntities, ref selectedEntities, InputUtils.IsShiftDown());
                 ShowInspectorWindow(selectedEntities.FirstOrDefault());
-                HightLightSelectedEntity(ref selectedEntities);
+                HightLightSelectedEntity(rootEntities,ref selectedEntities);
 
                 ImGui.End();
             }
         }
 
         #region Entity Hirachy
-        public static void HightLightSelectedEntity(ref List<Entity> selectedItems)
+        public static void HightLightSelectedEntity(IEnumerable<Entity> entities,ref List<Entity> selectedItems)
         {
             var c = (uint)Raylib.ColorToInt(new Color(255, 0, 0, 255));
 
-            foreach (var e in selectedEntities)
+            foreach (var e in selectedItems)
             {
+                if (e.Transform == null) continue;
+
                 var p = Core.Scene.ViewSpaceToWindowSpace(e.Transform.Position2 - (Core.Scene.Camera.target) + Core.Scene.Camera.offset);
                 var v1 = p - Vector2.UnitY * 20;
-                var v2 = p + new Vector2(0.5f,0.5f)*40;
-                var v3 = p + new Vector2(-0.5f,0.5f)* 40;
-                ImGui.GetForegroundDrawList().AddTriangle(v1,v2,v3, c,1);  // Red color
-                ImGui.GetForegroundDrawList().AddCircleFilled(p,5,c);
+                var v2 = p + new Vector2(0.5f, 0.5f) * 40;
+                var v3 = p + new Vector2(-0.5f, 0.5f) * 40;
+                ImGui.GetForegroundDrawList().AddTriangle(v1, v2, v3, c, 1);  // Red color
+                ImGui.GetForegroundDrawList().AddCircleFilled(p, 5, c);
             }
         }
         static void AddEntitiesListWidget(IEnumerable<Entity> entities, ref List<Entity> selectedItems, bool multiSelect)
         {
             if (ImGui.CollapsingHeader(Core.Scene.SceneName))
             {
-                selectedItems = selectedItems.Where(e => e.Scene != null).ToList();
+                //selectedItems = entities.Where(e => e.Scene != null && e.Transform != null).ToList();
                 //ImGui.BeginChild("Dsfds",ImGui.GetContentRegionAvail());
                 ImGui.BeginGroup();
                 //ImGui.SetNextWindowContentSize(new Vector2(500));
@@ -141,6 +144,7 @@ public class ImguiEntityManager : GlobalManager
 
                 HandleHirachyActions("actions");
             }
+
 
             ImGui.ShowDemoWindow();
         }
@@ -214,6 +218,7 @@ public class ImguiEntityManager : GlobalManager
         #region Inspector Window
         static void ShowInspectorWindow(Entity select)
         {
+            if (select == null || (select.Transform == null)) return;
 
             ImGui.SetNextWindowSizeConstraints(new Vector2(200, 300), new Vector2(1000, 1000));
             var entryAss = Assembly.GetEntryAssembly();
@@ -271,11 +276,10 @@ public class ImguiEntityManager : GlobalManager
             var inspectorWidth = ImGui.GetWindowWidth();
             ImGui.PushItemWidth(inspectorWidth / 3 - style.IndentSpacing - style.WindowPadding.X - style.ItemSpacing.X);
             var tf = select.Transform;
-            
+            if (tf == null) return;
             //position
             var prevPos = tf.LocalPosition;
             var pos = prevPos;
-
             ImGui.Text("Local Position");
             ImGui.DragFloat("X##p", ref pos.X); SameLine();
             ImGui.DragFloat("Y##p", ref pos.Y); SameLine();

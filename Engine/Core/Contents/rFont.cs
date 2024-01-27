@@ -1,15 +1,16 @@
-﻿using Engine.UI;
+﻿#if false
+using Engine.UI;
 using Raylib_cs;
 using System.Numerics;
 
 namespace Engine
 {
 
-    public class rFont :IDisposable
+    public class rFont : IDisposable
     {
-        public static readonly rFont Default = new rFont(Raylib.GetFontDefault());
+        //public static readonly rFont Default = new rFont(Raylib.GetFontDefault());
 
-        
+
         private Font? _font;
 
         public float Size;
@@ -22,8 +23,9 @@ namespace Engine
 
         public rFont(Font font)
         {
-            Size = Core.Scene.GetRenderTextureScale().Y *(1/16f);
-            Spacing = Size * 0.1f;
+            var a = Raylib.GetFontDefault();
+            Size = 10;//Core.Scene.GetRenderTextureScale().Y *(1/16f);
+            Spacing = 2f;
             SetFont(font);
         }
 
@@ -41,7 +43,7 @@ namespace Engine
 
         public bool ContainChar(char character)
         {
-            Raylib.GetGlyphInfo(_font.Value,character);
+            Raylib.GetGlyphInfo(_font.Value, character);
             return true;
         }
 
@@ -51,10 +53,10 @@ namespace Engine
         }
 
         public Vector2 MeasureText(string text)
-            =>Raylib.MeasureTextEx(_font.Value, text, Size, Spacing);
+            => Raylib.MeasureTextEx(_font.Value, text, Size, Spacing);
 
 
-        public  void Dispose()
+        public void Dispose()
         {
             if (_font.HasValue)
             {
@@ -63,8 +65,9 @@ namespace Engine
             }
         }
 
-        public static implicit operator Font(rFont rFont)=>rFont._font.Value;
+        public static implicit operator Font(rFont rFont) => rFont._font.Value;
     }
 
 
-}
+} 
+#endif

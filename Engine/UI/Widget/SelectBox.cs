@@ -53,15 +53,20 @@ namespace Engine.UI
 			var font = style.Font;
 
 			if (bg != null)
-				_prefHeight = Math.Max(bg.TopHeight + bg.BottomHeight + font.Size, bg.MinHeight);
+				_prefHeight = Math.Max(bg.TopHeight + bg.BottomHeight + style.FontScale, bg.MinHeight);
 				//_prefHeight = Math.Max(bg.TopHeight + bg.BottomHeight + font.Size - font.Spacing * 2f, bg.MinHeight);
 			else
-				_prefHeight = font.Size;
+				_prefHeight = style.FontScale;
 				//_prefHeight = font.Size - font.Spacing * 2;
 
 			float maxItemWidth = 0;
 			for (var i = 0; i < _items.Count; i++)
-				maxItemWidth = Math.Max(font.MeasureText(_items[i].ToString()).X, maxItemWidth);
+            {
+				//TODO:  UNSURE ABOUT FONTSIZE
+				var textSize = Raylib.MeasureTextEx(font, _items[i].ToString(), style.FontScale, style.FontSpacing);
+				_prefWidth = Math.Max(textSize.X, maxItemWidth);
+				//maxItemWidth = Math.Max(font.MeasureText(_items[i].ToString()).X, maxItemWidth);
+			}
 
 
 			_prefWidth = maxItemWidth;
@@ -118,15 +123,16 @@ namespace Engine.UI
 					width -= background.LeftWidth + background.RightWidth;
 					height -= background.BottomHeight + background.TopHeight;
 					x += background.LeftWidth;
-					y += (int)(height / 2 + background.BottomHeight - font.Size / 2);
+					y += (int)(height / 2 + background.BottomHeight - style.FontScale / 2);
 				}
 				else
 				{
-					y += (int)(height / 2 + font.Size / 2);
+					y += (int)(height / 2 + style.FontScale / 2);
 				}
 
 				fontColor = ColorExt.Create(fontColor, (int)(fontColor.a * parentAlpha));
-				font.DrawText( str, new Vector2(x, y),default,0, fontColor);
+				Raylib.DrawTextPro(font,str,new Vector2(x,y),default,0,style.FontScale,style.FontSpacing,fontColor);
+				//font.DrawText( str, new Vector2(x, y),default,0, fontColor);
 			}
 		}
 
@@ -457,7 +463,7 @@ namespace Engine.UI
 
 	public class SelectBoxStyle
 	{
-		public rFont Font;
+		public Font Font;
 
 		public Color FontColor = Color.WHITE;
 
@@ -472,14 +478,15 @@ namespace Engine.UI
 
 		/** Optional */
 		public IDrawable BackgroundOver, BackgroundOpen, BackgroundDisabled;
-
+        public int FontScale;
+        public float FontSpacing;
 
 		public SelectBoxStyle()
 		{
-			Font = rFont.Default;
+			Font = Raylib.GetFontDefault();
 		}
 
-		public SelectBoxStyle(rFont font, Color fontColor, IDrawable background, ScrollPaneStyle scrollStyle,
+		public SelectBoxStyle(Font font, Color fontColor, IDrawable background, ScrollPaneStyle scrollStyle,
 							  ListBoxStyle listStyle)
 		{
 			Font = font;

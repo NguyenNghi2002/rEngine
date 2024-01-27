@@ -4,7 +4,6 @@ using System.Numerics;
 using Engine.BitmapFonts;
 using Raylib_cs;
 using Raylib_cs.UI.Extra;
-using BitmapFont = Engine.rFont;
 
 namespace Engine.UI
 {
@@ -149,7 +148,7 @@ namespace Engine.UI
 			IDrawable selectedDrawable = _style.Selection;
 
 			//_itemHeight = /*font.getCapHeight()*/ font.LineHeight - font.Padding.Bottom * 2;
-			_itemHeight = font.Size ;
+			_itemHeight = font.baseSize ;
 			_itemHeight += selectedDrawable.TopHeight + selectedDrawable.BottomHeight;
 
 			_textOffsetX = selectedDrawable.LeftWidth;
@@ -158,7 +157,11 @@ namespace Engine.UI
 
 			_prefWidth = 0;
 			for (int i = 0; i < _items.Count; i++)
-				_prefWidth = Math.Max(font.MeasureText(_items[i].ToString()).X, _prefWidth);
+            {
+				//TODO:  UNSURE ABOUT FONTSIZE
+				var textSize = Raylib.MeasureTextEx(font, _items[i].ToString(),_style.FontScale,_style.FontSpacing);
+				_prefWidth = Math.Max(textSize.X, _prefWidth);
+            }
 
 			_prefWidth += selectedDrawable.LeftWidth + selectedDrawable.RightWidth;
 			_prefHeight = _items.Count * _itemHeight;
@@ -232,8 +235,8 @@ namespace Engine.UI
 					}
 
 					var textPos = new Vector2(x + _textOffsetX, y + itemY + _textOffsetY);
-					//Raylib.DrawTextEx(font,item.ToString(),textPos,10,2,fontColor);
-					font.DrawText(item.ToString(),textPos,default,0,fontColor);
+					Raylib.DrawTextEx(font,item.ToString(),textPos,_style.FontScale,_style.FontSpacing,fontColor);
+					//font.DrawText(item.ToString(),textPos,default,0,fontColor);
 					//batcher.DrawString(font, item.ToString(), textPos, fontColor);
 				}
 				else if (itemY < _cullingArea.Value.y)
@@ -401,7 +404,9 @@ namespace Engine.UI
 
 	public class ListBoxStyle
 	{
-		public BitmapFont Font;
+		public Font Font;
+		public float FontScale;
+		public float FontSpacing;
 		public Color FontColorSelected = Color.BLACK;
 		public Color FontColorUnselected = Color.WHITE;
 		public Color FontColorHovered = Color.BLACK;
@@ -417,13 +422,15 @@ namespace Engine.UI
 
 		public ListBoxStyle()
 		{
-			Font = rFont.Default;
+			Font = Raylib.GetFontDefault();
 		}
 
 
-		public ListBoxStyle(BitmapFont font, Color fontColorSelected, Color fontColorUnselected, IDrawable selection)
+		public ListBoxStyle(Font font, Color fontColorSelected, Color fontColorUnselected, IDrawable selection)
 		{
 			Font = font;
+			FontScale = font.baseSize;
+			FontScale = font.glyphPadding;
 			FontColorSelected = fontColorSelected;
 			FontColorUnselected = fontColorUnselected;
 			Selection = selection;

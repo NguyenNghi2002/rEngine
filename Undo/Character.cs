@@ -34,7 +34,10 @@ namespace Undo
 
             OnMoved += _gm.OnCharacterMoved;
         }
-
+        public override void OnRemovedFromEntity()
+        {
+            tweening.Clear();
+        }
         protected bool IsNextCellWalkable(int dx, int dy)
         {
             var nextLoc = _gridObj.GetLocation() + new VectorInt2(dx, dy);
@@ -63,7 +66,7 @@ namespace Undo
             if (!IsNextCellWalkable(dx, dy)) 
                 return false;
 
-
+            
             var nextCell = _gridObj.Grid.GetCell(_gridObj.GetLocation() + new VectorInt2(dx, dy));
 
             //
@@ -109,7 +112,7 @@ namespace Undo
             var offY = dy * 16;
 
             float x = 0, y = 0;
-            while (elapse < 1f)
+            while (elapse < 1f && en != null && en.Transform != null)
             {
                 elapse += Time.DeltaTime;
 
@@ -130,16 +133,49 @@ namespace Undo
     /// </summary>
     public class Player : Character
     {
+        bool isRegisted = false;
+        public override void OnEnable()
+        {
+            SetInputRegister(true);
+        }
+        public override void OnDisable()
+        {
+            SetInputRegister(false);
+        }
         public override void OnAddedToEntity()
         {
             base.OnAddedToEntity();
-
-            if(Scene.TryFindComponent(out InputManager input))
+            SetInputRegister(true);
+        }
+        void MoveLeft() => ControlMovement(-1, 0);
+        void MoveRight() => ControlMovement(1, 0);
+        void MoveUp() => ControlMovement(0, -1);
+        void MoveDown() => ControlMovement(0, 1);
+        void SetInputRegister(bool value)
+        {
+            if(value)
             {
-                input.OnLeft += ()=> ControlMovement(-1, 0);
-                input.OnRight += ()=> ControlMovement(1, 0);
-                input.OnUp += ()=> ControlMovement(0, -1);
-                input.OnDown += ()=> ControlMovement(0, 1);
+                Console.WriteLine("registered");
+                isRegisted = value;
+                if (Scene.TryFindComponent(out InputManager input))
+                {
+                    input.OnLeft    += MoveLeft;
+                    input.OnRight   += MoveRight;
+                    input.OnUp      += MoveUp;
+                    input.OnDown    += MoveDown;
+                }
+            }
+            if (value != isRegisted && isRegisted == true)
+            {
+                Console.WriteLine("DEEEEEEEEregistered");
+                isRegisted = value;
+                if (Scene.TryFindComponent(out InputManager input))
+                {
+                    input.OnLeft    -= MoveLeft;
+                    input.OnRight   -= MoveRight;
+                    input.OnUp      -= MoveUp;
+                    input.OnDown    -= MoveDown;
+                }
             }
         }
     }

@@ -14,7 +14,9 @@
     <Compile Include="GameMananger.cs" />
     <Compile Include="Grid.cs" />
     <Compile Include="GridObject.cs" />
+    <Compile Include="Scenes\LevelSelectorScene.cs" />
     <Compile Include="MoveCommand.cs" />
+    <Compile Include="Scenes\PlayScene.cs" />
     <Compile Include="TileMapSnappable.cs" />
     <Compile Include="Program.cs" />
   </ItemGroup>

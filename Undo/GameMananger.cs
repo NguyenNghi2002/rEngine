@@ -3,7 +3,9 @@ using Engine.TiledSharp;
 using Engine.UI;
 using ImGuiNET;
 using Raylib_cs;
+using System.Collections;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using Undo;
@@ -19,7 +21,7 @@ public class InputManager : Component, IUpdatable
             Down = KeyboardKey.KEY_DOWN
             ;
 
-    public event Action? OnLeft,OnRight,OnUp,OnDown;
+    public event Action? OnLeft,OnRight,OnUp,OnDown,OnEscapse;
     public override void OnAddedToEntity()
     {
         Entity.TryGetComponent(out _gm);
@@ -57,6 +59,9 @@ public class InputManager : Component, IUpdatable
         {
             _gm.RedoCommand();
         }
+
+        if (Input.IsKeyPressed(KeyboardKey.KEY_ESCAPE)) OnEscapse?.Invoke();
+
     }
 }
 public class GameMananger : Component,ICustomInspectorImgui
@@ -69,38 +74,45 @@ public class GameMananger : Component,ICustomInspectorImgui
     //Tilemap
     Entity tilemapEn;
     Grid<FloorCell> grid;
+    TmxMap _map;
+    InputManager _inputManager;
+    UICanvas _ui;
 
     public override void OnAddedToEntity()
     {
+        Debug.Assert(Scene.TryFindComponent(out _inputManager));
         Debug.Assert(Scene.TryFind("player", out playerEn));
         Debug.Assert(Scene.TryFind("tilemap", out tilemapEn));
+        Debug.Assert(tilemapEn.TryGetComponent(out grid));
+        Debug.Assert(ContentManager.TryGet("map", out _map));
 
-        tilemapEn.TryGetComponent(out grid);
 
-        
-        var defaultSkin = Skin.CreateDefaultSkin();
-        defaultSkin.Get<LabelStyle>().Font = ContentManager.Get<Font>("UpheavalPro");
-        defaultSkin.Get<LabelStyle>().Font = ContentManager.Get<Font>("UpheavalPro");
+        var defaultSkinName = UndoGame.DefaultUI;
+        var skin = UndoGame.GameSkin ;
 
-        ///Generate Floor grid
+        ///****************************************
+        ///Generate Tile that have id of non zero value
+        ///****************************************
         grid.HandleValues((loc) =>
         {
-            var map = ContentManager.Get<TmxMap>("map");
-            var layer = map.Layers[PlayScene.FLOOR_LAYER] as TmxLayer;
+            var layer = _map.Layers[PlayScene.WALL_LAYER] as TmxLayer;
             return new FloorCell()
             {
-                Walkable = layer.GetTile(loc.X, loc.Y).Gid != 0
+                Walkable = layer.GetTile(loc.X, loc.Y).Gid == 0
             };
         });
 
-        if (Entity.TryGetComponent<UICanvas>(out var uiCanvas))
+
+        ///****************************************
+        ///                 UI SYSTEM
+        ///****************************************
+        if (Entity.TryGetComponent<UICanvas>(out _ui))
         {
-            var butttonSize = 20;
+            var butttonSize = 25;
 
             var table = new Table()
                 .SetFillParent(true)
                 .Top()
-                //.DebugCell()
                 ;
                 ;
             table.PadTop(5);
@@ -110,34 +122,123 @@ public class GameMananger : Component,ICustomInspectorImgui
                 .Size(butttonSize);
                 ;
 
-            table.Add(new Label("Undo", ContentManager.Get<Font>("UpheavalPro")))
+            var title = new Label($"Level {(Scene as PlayScene).levelID}", skin, UndoGame.TitleUI);
+            table.Add(title)
                 .SetExpandX()
                 .Center()
                 .Top();
+            Core.Schedule(1.75f, false, null, timer =>
+            {
+                var duration = 1.6f;
+                Core.StartCoroutine(AnimateElementY(title, title.GetY(), -title.GetHeight(), duration));
+            });
 
-            table.Add(new TextButton("p", defaultSkin))
+            //var pauseWindow = CreatePauseMenu(skin);
+            table.Add(new TextButton("<", skin).AddLeftMouseListener((btt) => PauseGame()))
                 .SetExpandX()
-                .Size(butttonSize);
+                .Size(butttonSize)
+                
                 ;
 
-            uiCanvas.Stage.AddElement(table);
+            _ui.Stage.AddElement(table);
+            ;
         }
     }
-    public void ChangeScene()
-    {
 
+    public void ResumeGame()
+    {
+        _inputManager.SetEnable(true);
     }
-
-    public void CheckAllIndicators()
+    public void PauseGame()
     {
-        if(indicators.All(i => i.IsIndicated()))
-            Console.WriteLine("you win");
-        else
+        _inputManager.SetEnable(false);
+        ShowWindow(CreatePauseMenu(UndoGame.GameSkin, UndoGame.PauseUI), _ui.Stage);
+    }
+    public override void OnRemovedFromEntity()
+    {
+        //var cm = Core.Instance.Managers.Find(m => m is CoroutineManager) as CoroutineManager;
+        //cm.TogglePauseAll(true);
+    }
+    IEnumerator AnimateElementY(Element element, float start, float offset, float duration)
+    {
+        float elapse = 0;
+
+        while (elapse < duration)
         {
-            var undones = indicators.Where(i => !i.IsIndicated());
-            Console.WriteLine($"{undones.Count()} still missing");
+            elapse += Time.DeltaTime;
+            element.SetY(Easings.EaseBackIn(elapse, start, offset, duration));
+            yield return null;
         }
+        element.SetY(start + offset);
     }
+    void ShowWindow(Window window,Stage stage)
+    {
+        stage.AddElement(window);
+        window.Pack();
+
+        var width = window.GetWidth();
+        var height = window.GetHeight();
+
+        var w = MathF.Round((stage.GetWidth() - width) / 2);
+        var h = MathF.Round((stage.GetHeight() - height) / 2);
+        window.SetPosition(w, h);
+    }
+    Window CreatePauseMenu(Skin skin,string style)
+    {
+        float padTop = 10f;
+        float buttonPadding = 2f;
+
+        Window window = new Window("PAUSE",skin,style);
+        window.GetTitleTable().PadLeft(10).PadBottom(10);
+        window.SetMovable(false) ;
+        window.SetResizable(false) ;
+
+        window.Pad(5);
+        Table optionsSection = new Table();
+        Table bottomSection = new Table();
+
+        window.Add(optionsSection);
+
+        ///Resume button
+        var resumeBtt = new TextButton("Resume",skin, style);
+        resumeBtt.OnClicked += (b) =>
+        {
+            ResumeGame();
+            window.Remove();
+        };
+
+        /// Add 
+        optionsSection.Add(resumeBtt)
+            .SetPadTop(padTop)
+            .SetPadBottom(buttonPadding)
+            .SetFillX();
+        optionsSection.Row();
+        optionsSection.Add(bottomSection);
+
+
+        ///Bottom Section
+        ///Setting Button 
+        var settingBtt = new TextButton("Setting", skin, style);
+        settingBtt.OnClicked += (b) => Console.WriteLine("working on it"); ;
+        bottomSection.Add(settingBtt)
+            .Width(Value.PercentWidth(1.2f))
+            .SetPadRight(buttonPadding);
+
+        ///Back Button
+        var backBtt = new TextButton("Back", skin, style);
+        backBtt.OnClicked += (b) => GotoLevelSelector();
+        bottomSection.Add(backBtt)
+            .Width(Value.PercentWidth(1.2f));
+
+
+        return window;
+        
+    }
+
+    /// <summary>
+    /// Event Called from Character
+    /// </summary>
+    /// <param name="MovedEntity"></param>
     public void OnCharacterMoved(Entity MovedEntity)
     {
 #if true
@@ -155,33 +256,62 @@ public class GameMananger : Component,ICustomInspectorImgui
 #endif
     }
 
+    #region Utilities
+    public void CheckAllIndicators()
+    {
+        if (indicators.All(i => i.IsIndicated()))
+        {
+            Console.WriteLine("you win");
+            var nextLevelID = (Scene as PlayScene).levelID + 1;
+            if (UndoGame.LevelsDictionary.TryGetValue(nextLevelID, out _))
+            {
+                if (Scene.TryFindComponent<InputManager>(out var inputManager))
+                    inputManager.SetEnable(false);
+                GoToLevel(nextLevelID);
+            }
+            else
+                GotoLevelSelector();
+        }
+        else
+        {
+            var undones = indicators.Where(i => !i.IsIndicated());
+            Console.WriteLine($"{undones.Count()} still missing");
+        }
+    }
+    public void GoToLevel(int levelID)
+        => Core.StartTransition(new FadeTransition(() => new PlayScene(levelID)));
+    public void GotoLevelSelector()
+        => Core.StartTransition(new FadeTransition(() => new LevelSelectorScene())); 
+    #endregion
+
+    #region Command System
     struct CharactersMoveCommand : CommandSystem.ICommand
     {
         List<KeyValuePair<Character, VectorInt2>> movements;
 
-        public CharactersMoveCommand( List<KeyValuePair< Character, VectorInt2>> movements)
+        public CharactersMoveCommand(List<KeyValuePair<Character, VectorInt2>> movements)
         {
             this.movements = movements;
         }
         void CommandSystem.ICommand.Execute()
         {
-            
+
             foreach (KeyValuePair<Character, VectorInt2> movement in movements)
             {
                 var character = movement.Key;
-                var delta = movement.Value ;
+                var delta = movement.Value;
 
                 character.MoveRecursive(delta.X, delta.Y, false);
 
             }
         }
-         
+
         void CommandSystem.ICommand.Redo()
         {
             foreach (KeyValuePair<Character, VectorInt2> movement in movements)
             {
                 var character = movement.Key;
-                var delta =    movement.Value;
+                var delta = movement.Value;
 
                 character.MoveRecursive(delta.X, delta.Y, false);
 
@@ -214,16 +344,15 @@ public class GameMananger : Component,ICustomInspectorImgui
     }
     List<KeyValuePair<Character, VectorInt2>> characterMovements = new();
 
-
-    public void RequestMovement(Character character,VectorInt2 movement)
+    public void RequestMovement(Character character, VectorInt2 movement)
     {
         characterMovements.Add(new(character, movement));
     }
     public void ExecuteCommand()
     {
-        if(this.Entity.TryGetComponent(out CommandSystem cmd) && characterMovements.Count != 0)
+        if (this.Entity.TryGetComponent(out CommandSystem cmd) && characterMovements.Count != 0)
         {
-            cmd.ExecuteCommand(new CharactersMoveCommand(new (characterMovements)));
+            cmd.ExecuteCommand(new CharactersMoveCommand(new(characterMovements)));
             characterMovements.Clear();
         }
     }
@@ -236,7 +365,6 @@ public class GameMananger : Component,ICustomInspectorImgui
 
         }
     }
-
     public void RedoCommand()
     {
         if (this.Entity.TryGetComponent(out CommandSystem cmd))
@@ -246,6 +374,7 @@ public class GameMananger : Component,ICustomInspectorImgui
         }
     }
 
+    #endregion
     void ICustomInspectorImgui.OnInspectorGUI()
     {
         if(ImGuiNET.ImGui.Button("Reset Scene") )

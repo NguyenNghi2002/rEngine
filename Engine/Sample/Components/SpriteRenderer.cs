@@ -9,6 +9,9 @@ using System.Numerics;
 
 namespace Engine
 {
+    /// <summary>
+    /// Sprite must be single
+    /// </summary>
     public class ScrollingSpriteRenderer : TiledSpriteRenderer,IUpdatable
     {
         public ScrollingSpriteRenderer(Texture2D texture,float scrollXSpeed = 15, float scrollYSpeed = 5) : base(texture)
@@ -69,7 +72,7 @@ namespace Engine
             }
             else
             {
-                Raylib.DrawTextPro(rFont.Default, $"[{Entity.Name}]SpriteRenderer", Transform.Position.ToVec2(), default, 0, 20, 2, TintColor);
+                Raylib.DrawTextPro(Raylib.GetFontDefault(), $"[{Entity.Name}]SpriteRenderer", Transform.Position.ToVec2(), default, 0, 20, 2, TintColor);
             }
         }
     }
@@ -201,7 +204,7 @@ namespace Engine
             }
             else
             {
-                Raylib.DrawTextPro(rFont.Default, $"[{Entity.Name}]SpriteRenderer", Transform.Position.ToVec2(), default, 0, 20, 2, TintColor);
+                Raylib.DrawTextPro(Raylib.GetFontDefault(), $"[{Entity.Name}]SpriteRenderer", Transform.Position.ToVec2(), default, 0, 20, 2, TintColor);
             }
         }
 
