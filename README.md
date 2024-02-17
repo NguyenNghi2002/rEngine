@@ -164,8 +164,8 @@ public class SamepleRenderComponent : RenderableComponent
 
 
 # Engine Todos list:
-- [ ] Give it a name
-- [ ] Create a fully released game with the engine
+- [x] Give it a name
+- [x] Create a fully released game with the engine
 - [ ] Create shader systems
 - [ ] Update trail system
 - [ ] Update particle system
