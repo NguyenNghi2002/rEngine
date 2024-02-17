@@ -1,10 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <ApplicationIcon>bin\Debug\net6.0\.contents\reundo_icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +15,8 @@
     <Compile Include="GameMananger.cs" />
     <Compile Include="Grid.cs" />
     <Compile Include="GridObject.cs" />
+    <Compile Include="LevelInfo.cs" />
+    <Compile Include="MainMenuScene.cs" />
     <Compile Include="Scenes\LevelSelectorScene.cs" />
     <Compile Include="MoveCommand.cs" />
     <Compile Include="Scenes\PlayScene.cs" />
@@ -22,6 +25,57 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="bin\Debug\net6.0\.contents\back.wav" />
+    <Content Include="bin\Debug\net6.0\.contents\click.wav" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 1\1.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 1\2.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 1\3.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 1\4.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 2\1.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 2\2.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 2\3.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 2\4.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 3\1.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 3\2.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 3\3.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 3\4.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 4\1.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 4\2.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 4\3.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 4\4.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 5\1.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 5\2.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 5\3.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 5\4.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 5\5.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 6\1.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 6\2.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 6\3.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 6\4.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 6\5.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 6\6.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 7\1.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 7\2.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 7\3.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 7\4.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 8\1.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 8\2.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 8\3.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 8\4.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 8\5.png" />
+    <Content Include="bin\Debug\net6.0\.contents\Clouds\Clouds 8\6.png" />
+    <Content Include="bin\Debug\net6.0\.contents\forward.wav" />
+    <Content Include="bin\Debug\net6.0\.contents\redo.wav" />
+    <Content Include="bin\Debug\net6.0\.contents\select.wav" />
+    <Content Include="bin\Debug\net6.0\.contents\click_play.wav" />
+    <Content Include="bin\Debug\net6.0\.contents\undo.wav" />
+    <Content Include="bin\Debug\net6.0\.contents\walk.wav" />
+    <Content Include="bin\Debug\net6.0\.contents\reundo_icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="bin\Debug\net6.0\.contents\The Verdant Grove.ogg" />
+    <None Include="bin\Debug\net6.0\.contents\The Vile Grove.ogg" />
     <None Include="bin\Debug\net6.0\raylib.dll" />
   </ItemGroup>
 

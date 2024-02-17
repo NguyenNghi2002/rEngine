@@ -817,6 +817,7 @@ namespace Engine.UI
 
 		/// <summary>
 		/// Sets fillX and fillY to 1 if true, 0 if false.
+		/// This will fill up the size of parent
 		/// </summary>
 		/// <param name="fill">If set to <c>true</c> fill.</param>
 		public Cell Fill(bool fill)

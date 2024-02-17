@@ -2,10 +2,15 @@
 
 namespace Engine.Collections.Generic
 {
+    /// <summary>
+    /// Double dictionary
+    /// </summary>
+    /// <typeparam name="T1"></typeparam>
+    /// <typeparam name="T2"></typeparam>
     public class Map<T1, T2> 
     {
-        private Dictionary<T1, T2> _forward = new Dictionary<T1, T2>();
-        private Dictionary<T2, T1> _reverse = new Dictionary<T2, T1>();
+        private readonly Dictionary<T1, T2> _forward = new Dictionary<T1, T2>();
+        private readonly Dictionary<T2, T1> _reverse = new Dictionary<T2, T1>();
 
         public Map()
         {

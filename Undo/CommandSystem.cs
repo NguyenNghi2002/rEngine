@@ -16,6 +16,10 @@ namespace Undo
         List<ICommand> _commands = new List<ICommand>();
         int _commandIndex = 0;
         public int Count => _commands.Count;
+        /// <summary>
+        /// Repeat the action in the history
+        /// </summary>
+        /// <returns><see cref="true"/> on successful redo, <see cref="false"/> when out of bound</returns>
         public bool SendRedoCommand()
         {
             if (_commandIndex > _commands.Count - 1) return false;
@@ -24,6 +28,10 @@ namespace Undo
             _commandIndex++;
             return true;
         }
+        /// <summary>
+        /// Reverse the action in the history
+        /// </summary>
+        /// <returns><see cref="true"/> on successful redo, <see cref="false"/> when out of bound</returns>
         public bool SendUndoCommand()
         {
             if (_commandIndex <= 0) return false;

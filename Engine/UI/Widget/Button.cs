@@ -13,7 +13,7 @@ namespace Engine.UI
         protected override void OnChildrenChanged()
         {
             base.OnChildrenChanged();
-        }
+		}
         public Button AddLeftMouseListener(Action<Button> OnLeftClickedCallBack)
         {
 			OnClicked += OnLeftClickedCallBack;
@@ -72,6 +72,9 @@ namespace Engine.UI
 
 		public override float MinHeight => PreferredHeight;
 
+		/// <summary>
+		/// Event <see cref="OnChanged"/> will be fired depend on <see cref="ProgrammaticChangeEvents"/>.
+		/// </summary>
 		public bool IsChecked
 		{
 			get => _isChecked;
@@ -158,12 +161,13 @@ namespace Engine.UI
 
 		void IInputListener.OnMouseMoved(Vector2 mousePos)
 		{
+			var d = DistanceOutsideBoundsToPoint(mousePos);
 			// if we get too far outside the button cancel future events
-			if (DistanceOutsideBoundsToPoint(mousePos) > ButtonBoundaryThreshold)
+			if (d > ButtonBoundaryThreshold)
             {
                 _mouseDown = _mouseOver = false;
                 GetStage().RemoveInputFocusListener(this);
-            } 
+            }
 		}
 
 
@@ -328,6 +332,11 @@ namespace Engine.UI
 			IsChecked = !_isChecked;
 		}
 
+		public void VerifyState()
+        {
+			var hitted = Hit(GetStage().GetMousePosition());
+			 _mouseOver = hitted == this;
+        }
 
 		/// <summary>
 		/// Returns the button's style. Modifying the returned style may not have an effect until {@link #setStyle(ButtonStyle)} is called.
@@ -359,15 +368,15 @@ namespace Engine.UI
 		{
 			Validate();
 
-			if (_isDisabled && style.Disabled != null)
+			if (_isDisabled && style.Disabled != null) // Disable
 				_background = style.Disabled;
-			else if (_mouseDown && style.Down != null)
+			else if (_mouseDown && style.Down != null) // Down
 				_background = style.Down;
-			else if (_isChecked && style.Checked != null)
+			else if (_isChecked && style.Checked != null) // Checked
 				_background = (style.CheckedOver != null && _mouseOver) ? style.CheckedOver : style.Checked;
-			else if (_mouseOver && style.Over != null)
+			else if (_mouseOver && style.Over != null) //Over
 				_background = style.Over;
-			else if (style.Up != null) //
+			else if (style.Up != null) //Up
 				_background = style.Up;
 			SetBackground(_background);
 

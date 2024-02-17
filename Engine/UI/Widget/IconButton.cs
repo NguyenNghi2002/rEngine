@@ -26,12 +26,10 @@ namespace Engine.UI
             PadLeft(style.PadLeft).PadRight(style.PadRight).PadTop(style.PadTop).PadBottom(style.PadBottom);
             SetSize(PreferredWidth, PreferredHeight);
         }
-#if false
 
         public IconButton(Skin skin, string styleName = null) : this(skin.Get<IconButtonStyle>(styleName))
         { }
 
-#endif
 
         public IconButton(IDrawable icon, IDrawable imageUp) : this(new IconButtonStyle(icon, null, null, null, imageUp, null, null))
         {

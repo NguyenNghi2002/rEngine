@@ -8,6 +8,9 @@ namespace Engine.UI
     public class SpriteDrawable : IDrawable
     {
         public Sprite Sprite;
+
+        public Vector2 Offset;
+        public float Angle;
         public float LeftWidth { get; set; }
         public float RightWidth { get; set; }
         public float TopHeight { get; set; }
@@ -27,7 +30,7 @@ namespace Engine.UI
         public void Draw(float x, float y, float width, float height, Color color)
         {
             if(Sprite != null)
-            Raylib.DrawTexturePro(Sprite.Atlas.Texture.Value, new Rectangle(Sprite.PositionX, Sprite.PositionY, Sprite.SourceWidth, Sprite.SourceHeight), new Rectangle(x, y, width, height), Vector2.Zero, 0, color);
+            Raylib.DrawTexturePro(Sprite.Atlas.Texture.Value, new Rectangle(Sprite.PositionX, Sprite.PositionY, Sprite.SourceWidth, Sprite.SourceHeight), new Rectangle(x, y, width, height), Offset, Angle, color);
         }
 
         public void SetPadding(float top, float bottom, float left, float right)

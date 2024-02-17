@@ -245,7 +245,7 @@ namespace Engine.SceneManager
                 _finalRectangle, Vector2.Zero,
                 0, Color.WHITE
                 );
-            Raylib.DrawFPS((int)(_finalRectangle.x + 10), (int)(_finalRectangle.y + 10));
+            //Raylib.DrawFPS((int)(_finalRectangle.x + 10), (int)(_finalRectangle.y + 10));
 
         }
         public Rectangle GetFinalResolution()

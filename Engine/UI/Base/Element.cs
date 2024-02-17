@@ -5,27 +5,7 @@ using Color = Raylib_cs.Color;
 
 namespace Engine.UI
 {
-	public static class ElementExt
-    {
-		public static Container WarpContain(this Element element) 
-        {
-			var a = new Container(element).SetSize(element.GetScaleX(), element.GetScaleY());
-			return a;
-        }
-		public static T Size<T>(this T element, float x, float y) where T : Element
-			=> element.Size(new Value.Fixed(x), new Value.Fixed(x));
-		public static T Size<T>(this T element, float value) where T : Element
-			=> element.Size(new Value.Fixed(value));
-		public static T Size<T>(this T element,Value value) where T : Element
-        {
-			return element.Size( value,value);
-        }
-		public static T Size<T>(this T element,Value valueX,Value valueY) where T : Element
-        {
-			element.SetSize(0, 0);
-			return element;
-        }
-    }
+
 	public class Element : ILayout
 	{
 		protected Stage _stage;

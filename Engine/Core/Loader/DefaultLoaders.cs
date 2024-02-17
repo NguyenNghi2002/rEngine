@@ -41,6 +41,16 @@ namespace Engine
         }
     }
 
+    public class MusicLoader : IResourceHandler
+    {
+        object IResourceHandler.Load(string path) => Raylib.LoadMusicStream(path);
+        void IResourceHandler.Unload(object resource)
+        {
+            if (resource is Music music)
+                Raylib.UnloadMusicStream(music);
+        }
+    }
+
     public class SkinLoader : IResourceHandler
     {
         public object Load(string path)

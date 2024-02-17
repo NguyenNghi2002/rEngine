@@ -22,17 +22,21 @@ public class PlayScene : Scene
 
     public const int OBJECT_CHRACTER_LAYER = 0;
     public const int INDICATOR_CHRACTER_LAYER = 1;
+
+    protected PlaySceneInputManager inputManager;
+
+    public TmxMap map;
     public PlayScene(int levelID) 
-        : base($"level {levelID}",UndoGame.DEFAULT_SCENE_WIDTH,UndoGame.DEFAULT_SCENE_HEIGHT,Color.DARKBLUE,Color.BLACK)
+        : base($"level {levelID}",ReUndoGame.DEFAULT_SCENE_WIDTH,ReUndoGame.DEFAULT_SCENE_HEIGHT,Color.DARKBLUE,Color.BLACK)
     {
         this.levelID = levelID;
     }
 
-    public TmxMap map;
+
     public override void OnLoad()
     {
         var a = ContentManager.Instance;
-        map = ContentManager.Load<TmxMap>("map", () => new TmxMap($"{UndoGame.tilemapDir}\\{UndoGame.LevelsDictionary[levelID]}.tmx") );
+        map = ContentManager.Load<TmxMap>("map", () => new TmxMap($"{ReUndoGame.tilemapDir}\\{ReUndoGame.LevelsDictionary[levelID].Name}.tmx") );
     }
     public override void OnUnload()
     {
@@ -44,16 +48,21 @@ public class PlayScene : Scene
         Filter                          = Raylib_cs.TextureFilter.TEXTURE_FILTER_POINT;
         TmxObjectGroup entitiesGroup    = map.FindObjectGroup(ENTITIES_LAYER);
         TmxObjectGroup indicatorsGroup  = map.FindObjectGroup(INDICATORS_LAYER);
+        PlaySceneInputManager a;
 
-
-        var managers = CreateEntity("manager")
+        var managers= CreateEntity("manager")
             .AddComponent<GameMananger>() 
-            .AddComponent<InputManager>()
+            .AddComponent<PlaySceneInputManager>(out inputManager)
             .AddComponent<CommandSystem>()
             .AddComponent<UICanvas>()
                 .SetRenderOrder(float.MaxValue)
             .Entity
             ;
+
+        inputManager.AllowUndo = map.Properties.TryGetValue("game_AllowUndo", out string isAllowUndoStr) ?
+            (bool.TryParse(isAllowUndoStr , out bool isAllowUndo) ? isAllowUndo : true) : true;
+        inputManager.AllowRedo = map.Properties.TryGetValue("game_AllowRedo", out string isAllowRedoStr) ?
+            (bool.TryParse(isAllowRedoStr, out bool isAllowRedo) ? isAllowRedo : true) : true;
 
         var tilemapEn = CreateEntity("tilemap")
             .AddComponent(new TileMapRenderer(map, FLOOR_LAYER, SHADOW_LAYER, WALL_LAYER))
@@ -61,7 +70,6 @@ public class PlayScene : Scene
             .Entity
             .ScaleTo(2,2,1);
             ;
-
         
         #region Goals
         foreach (TmxObject obj in indicatorsGroup.Objects)
@@ -153,6 +161,25 @@ public class PlayScene : Scene
         //TODO: Add transition
         //TODO: Add main menul
         //TODO: Add level selector
+
+    }
+}
+
+
+public class ModifiedPlayScene : PlayScene
+{
+    private readonly bool _allowUndo;
+    private readonly bool _allowRedo;
+
+    public ModifiedPlayScene(int levelID, bool allowUndo,bool allowRedo) : base(levelID)
+    {
+        this._allowUndo = allowUndo;
+        this._allowRedo = allowRedo;
+    }
+
+    public override void OnBegined()
+    {
+        base.OnBegined();
 
     }
 }

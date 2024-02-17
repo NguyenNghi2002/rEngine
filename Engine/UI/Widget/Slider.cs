@@ -35,7 +35,7 @@ namespace Engine.UI
             this.style = style;
         }
 
-#if false
+#if true
         public Slider(float min, float max, float stepSize, bool vertical, Skin skin, string styleName = null) : this(
             min, max, stepSize, vertical, skin.Get<SliderStyle>(styleName))
         {

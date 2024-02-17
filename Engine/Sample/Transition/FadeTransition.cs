@@ -1,54 +1,54 @@
 ﻿using Engine.SceneManager;
+using Engine.Timer;
 using Raylib_cs;
 using System.Collections;
 
 namespace Engine
 {
-    public class FadeTransition : Transition
+    public class SwipeTransition : TimeBaseTransition
+    {
+        Rectangle rectangle = default;
+        Color color = Color.WHITE;    
+        public SwipeTransition(Func<Scene> sceneLoadAction) : base(sceneLoadAction)
+        {
+        }
+
+
+        public override void Render()
+        {
+
+            if (Core.Scene != null)
+            {
+                Raylib.DrawRectangleRec(rectangle, color);
+            }
+            else
+                Raylib.DrawRectangleRec(new Rectangle(0, 0, Raylib.GetScreenWidth(), Raylib.GetScreenHeight()), color);
+        }
+
+        public override void UpdateEnterScene(float elapse)
+        {
+            rectangle = Core.Scene.GetFinalResolution();
+            rectangle.height = Easings.EaseExpoOut(elapse, Core.Scene.GetFinalResolution().height, - Core.Scene.GetFinalResolution().height, ExitDuration);
+            rectangle.y = Core.Scene.GetFinalResolution().height - rectangle.height;
+        }
+
+        public override void UpdateExitScene(float elapse)
+        {
+            rectangle = Core.Scene.GetFinalResolution();
+            rectangle.height = Easings.EaseExpoOut(elapse,0,Core.Scene.GetFinalResolution().height,EnterDuration);
+        }
+
+    }
+
+    public class FadeTransition : TimeBaseTransition
     {
         Color OverlayColor = Color.WHITE;
-        public float FadeOutDuration = 0.4f;
-        public float FadeInDuration = 0.4f;
-        public float HoldDuration = 0.1f; // Hold
-
 
         Color _color;
         public FadeTransition(Func<Scene> sceneLoadAction) : base(sceneLoadAction)
         { }
 
-        public override IEnumerator OnBegin()
-        {
-            #region Onverlay
-            var elapse = 0f;
-            while (elapse < FadeOutDuration)
-            {
-                elapse += Time.UnscaledDeltaTime;
-                _color = Raylib.Fade(OverlayColor, Raymath.Lerp(0f, 1f, elapse / FadeOutDuration));
-                Console.WriteLine(elapse);
-                yield return null;
-            }
-            OnFadedOut?.Invoke(); 
-            #endregion
-
-            yield return Core.StartCoroutine(LoadNewScene());
-
-            Console.WriteLine("load new scene");
-
-            yield return new WaitForSecond(HoldDuration);
-
-            #region overlay
-            elapse = 0f;
-            while (elapse < FadeInDuration)
-            {
-                elapse += Time.UnscaledDeltaTime;
-                _color = Raylib.Fade(OverlayColor, Raymath.Lerp(1f, 0f, elapse / FadeOutDuration));
-                yield return null;
-            }
-            #endregion
-
-            TransitionCompleted();
-            Console.WriteLine("COMPLETED TRANSITION");
-        }
+       
         public override void Render()
         {
             if(Core.Scene != null)
@@ -58,6 +58,16 @@ namespace Engine
             }
             else
                 Raylib.DrawRectangleRec(new Rectangle(0, 0, Raylib.GetScreenWidth(), Raylib.GetScreenHeight()), _color);
+        }
+
+        public override void UpdateExitScene(float elapse)
+        {
+            _color = Raylib.Fade(OverlayColor, Raymath.Lerp(0f, 1f, elapse / ExitDuration));
+        }
+
+        public override void UpdateEnterScene(float elapse)
+        {
+            _color = Raylib.Fade(OverlayColor, Raymath.Lerp(1f, 0f, elapse / EnterDuration));
         }
     }
 }

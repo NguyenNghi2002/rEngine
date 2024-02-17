@@ -184,6 +184,7 @@ namespace Engine.UI
 
 				Font = Font,
 				FontColor = FontColor,
+				FontScale = FontScale,
 				DownFontColor = DownFontColor,
 				OverFontColor = OverFontColor,
 				CheckedFontColor = CheckedFontColor,

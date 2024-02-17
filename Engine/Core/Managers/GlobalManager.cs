@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 namespace Engine
 {
 
+    /// <summary>
+    ///Use <see cref="IUpdatable"/> to allow update
+    /// </summary>
     public class GlobalManager 
     {
         private bool _enable = true;

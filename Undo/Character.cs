@@ -20,7 +20,7 @@ namespace Undo
 
         protected GameMananger _gm;
         protected GridObject _gridObj;
-        public event Action<Entity>? OnMoved;
+        public event Action<int,int>? OnMoved;
 
         public override void OnAddedToEntity()
         {
@@ -32,7 +32,7 @@ namespace Undo
             _gridObj.SnapLocation(Transform.LocalPosition2);
             _gridObj.SnapTransform(_gridObj.Grid.CellSize / 2f);
 
-            OnMoved += _gm.OnCharacterMoved;
+            OnMoved += _gm.OnSingleCharacterMoved;
         }
         public override void OnRemovedFromEntity()
         {
@@ -57,9 +57,10 @@ namespace Undo
      
         internal void ControlMovement(int dx, int dy)
         {
-            MoveRecursive(dx,dy, true);
+            RelocateRecursive(dx,dy, true);
+            _gm.ExecuteCommand();
         } 
-        internal bool MoveRecursive(int dx,int dy,bool allowSaveHistory)
+        internal bool RelocateRecursive(int dx,int dy,bool allowSaveHistory)
         {
             //Check if next cell is floor
             //, return FALSE
@@ -76,7 +77,7 @@ namespace Undo
 
                 if (!character.Pushable) return false;
 
-                if (!character.MoveRecursive(MathF.Sign(dx), MathF.Sign(dy), allowSaveHistory))
+                if (!character.RelocateRecursive(MathF.Sign(dx), MathF.Sign(dy), allowSaveHistory))
                     return false;
             }
 
@@ -98,7 +99,8 @@ namespace Undo
                     Core.StartCoroutine(AnimateMove(dx, dy, sprite.Entity,tweening,0.3f));
                 }
 
-                OnMoved?.Invoke(this.Entity);
+                var loc = _gridObj.GetLocation();
+                OnMoved?.Invoke(loc.X,loc.Y);
                 return true;
             }
 
@@ -147,17 +149,19 @@ namespace Undo
             base.OnAddedToEntity();
             SetInputRegister(true);
         }
+        #region Events 
         void MoveLeft() => ControlMovement(-1, 0);
         void MoveRight() => ControlMovement(1, 0);
         void MoveUp() => ControlMovement(0, -1);
-        void MoveDown() => ControlMovement(0, 1);
+        void MoveDown() => ControlMovement(0, 1); 
+        #endregion
         void SetInputRegister(bool value)
         {
             if(value)
             {
                 Console.WriteLine("registered");
                 isRegisted = value;
-                if (Scene.TryFindComponent(out InputManager input))
+                if (Scene.TryFindComponent(out PlaySceneInputManager input))
                 {
                     input.OnLeft    += MoveLeft;
                     input.OnRight   += MoveRight;
@@ -169,7 +173,7 @@ namespace Undo
             {
                 Console.WriteLine("DEEEEEEEEregistered");
                 isRegisted = value;
-                if (Scene.TryFindComponent(out InputManager input))
+                if (Scene.TryFindComponent(out PlaySceneInputManager input))
                 {
                     input.OnLeft    -= MoveLeft;
                     input.OnRight   -= MoveRight;
@@ -198,7 +202,8 @@ namespace Undo
         public bool IsIndicated()
         {
             var cell = _gridObj.Grid.GetCell(_gridObj.GetLocation());
-            return cell.Objects.Any(o => o != this._gridObj && o.Entity.GetComponent<Character>().SocketID == this.SocketID);
+            var result = cell.Objects.Any(o => o != this._gridObj && o.Entity.GetComponent<Character>().SocketID == this.SocketID);
+            return result;
         }
     }
 

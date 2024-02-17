@@ -1,72 +1,79 @@
 ﻿using Engine;
+using Engine.Collections.Generic;
 using Engine.TiledSharp;
 using Engine.UI;
 using ImGuiNET;
 using Raylib_cs;
 using System.Collections;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Dynamic;
+using System.Net.Http.Headers;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using Undo;
 
-public class InputManager : Component, IUpdatable
+public class PlaySceneInputManager : Component, IUpdatable
 {
-    GameMananger _gm;
+    GameMananger gm;
     int IUpdatable.UpdateOrder { get; set; }
+    public bool AllowCommand { set => AllowUndo = AllowRedo = value; }
+
     public KeyboardKey
             Left = KeyboardKey.KEY_LEFT,
             Right = KeyboardKey.KEY_RIGHT,
             Up = KeyboardKey.KEY_UP,
-            Down = KeyboardKey.KEY_DOWN
+            Down = KeyboardKey.KEY_DOWN,
+            Undo = KeyboardKey.KEY_Z,
+            Redo = KeyboardKey.KEY_X,
+            Back = KeyboardKey.KEY_ESCAPE,
+            Restart = KeyboardKey.KEY_R
             ;
+    public  bool AllowUndo = true;
+    public  bool AllowRedo = true;
+    public  bool AllowControl = true;
 
-    public event Action? OnLeft,OnRight,OnUp,OnDown,OnEscapse;
+    public event Action? OnLeft,OnRight,OnUp,OnDown
+        ,OnUndo,OnRedo,OnRestart,OnEsc;
+
     public override void OnAddedToEntity()
     {
-        Entity.TryGetComponent(out _gm);
+        Entity.TryGetComponent(out gm);
         base.OnAddedToEntity();
     }
     void IUpdatable.Update()
     {
-        if (Input.IsKeyPressed(Left))
-        {
-            OnLeft?.Invoke();
-            _gm.ExecuteCommand();
-        }
-        if (Input.IsKeyPressed(Right))
-        {
-            OnRight?.Invoke();
-            _gm.ExecuteCommand();
-        }
-        if (Input.IsKeyPressed(Up))
-        {
-            OnUp?.Invoke();
-            _gm.ExecuteCommand();
-        }
-        if (Input.IsKeyPressed(Down))
-        {
-            OnDown?.Invoke();
-            _gm.ExecuteCommand();
-        }
+        if (Input.IsKeyPressed(Left) && AllowControl) OnLeft?.Invoke();
+        if (Input.IsKeyPressed(Right) && AllowControl) OnRight?.Invoke();
+        if (Input.IsKeyPressed(Up) & AllowControl) OnUp?.Invoke();
+        if (Input.IsKeyPressed(Down) & AllowControl) OnDown?.Invoke();
 
-        if (Input.IsKeyPressed(KeyboardKey.KEY_Z))
-        {
-            _gm.UndoCommand();
-        }
+        if (AllowUndo && Input.IsKeyPressed(Undo)) OnUndo?.Invoke();
+        if (AllowRedo && Input.IsKeyPressed(Redo)) OnRedo?.Invoke();
 
-        if (Input.IsKeyPressed(KeyboardKey.KEY_X))
-        {
-            _gm.RedoCommand();
-        }
-
-        if (Input.IsKeyPressed(KeyboardKey.KEY_ESCAPE)) OnEscapse?.Invoke();
+        if (Input.IsKeyReleased(Back)) OnEsc?.Invoke();
+        if (Input.IsKeyReleased(Restart)) OnRestart?.Invoke();
 
     }
 }
+
+
+/// <summary>
+///                 [GAME MANAGER]<br/>
+///     Control game input and manager object in game <br/>
+/// NOTE: this component can must have and only single one exist in single scene
+/// </summary>
 public class GameMananger : Component,ICustomInspectorImgui
 {
     internal List<Indicator> indicators = new List<Indicator>();
+
+    internal int _moveCount = 15;
+    internal int MoveCount
+    {
+        get => _moveCount;
+        set => SetMoveCount(value);
+    }
 
     //Player
     Entity playerEn;
@@ -75,9 +82,23 @@ public class GameMananger : Component,ICustomInspectorImgui
     Entity tilemapEn;
     Grid<FloorCell> grid;
     TmxMap _map;
-    InputManager _inputManager;
-    UICanvas _ui;
+    PlaySceneInputManager _inputManager;
+    UICanvas uiCanvas;
+    Window pauseWindow;
+    Button pauseBtt;
 
+    public bool IsGamePaused => pauseBtt != null && pauseBtt.IsChecked;
+
+    public void SetMoveCount(int moves)
+    {
+        _moveCount = moves;
+        moveCountLabel?.SetText($"{moves}");
+        if (MoveCount <= 0)
+            _inputManager.AllowControl = false;
+
+    }
+
+    
     public override void OnAddedToEntity()
     {
         Debug.Assert(Scene.TryFindComponent(out _inputManager));
@@ -87,8 +108,8 @@ public class GameMananger : Component,ICustomInspectorImgui
         Debug.Assert(ContentManager.TryGet("map", out _map));
 
 
-        var defaultSkinName = UndoGame.DefaultUI;
-        var skin = UndoGame.GameSkin ;
+
+        
 
         ///****************************************
         ///Generate Tile that have id of non zero value
@@ -103,62 +124,112 @@ public class GameMananger : Component,ICustomInspectorImgui
         });
 
 
+        var defaultSkinName = ReUndoGame.DefaultUI;
+        var gameSkin = ReUndoGame.GameSkin ;
+
         ///****************************************
         ///                 UI SYSTEM
         ///****************************************
-        if (Entity.TryGetComponent<UICanvas>(out _ui))
+        if (Entity.TryGetComponent<UICanvas>(out uiCanvas))
         {
+            #region GameUI
             var butttonSize = 25;
 
-            var table = new Table()
+            var topUI = new Table()
                 .SetFillParent(true)
+                .PadTop(5)
                 .Top()
                 ;
-                ;
-            table.PadTop(5);
 
-            table.Add(new Container())
+            //Left container cell
+            topUI.Add(new Container())
                 .SetExpandX()
                 .Size(butttonSize);
                 ;
 
-            var title = new Label($"Level {(Scene as PlayScene).levelID}", skin, UndoGame.TitleUI);
-            table.Add(title)
-                .SetExpandX()
+            //Title Label
+            bool hasName = _map.Properties.TryGetValue("name", out string mapName);
+            string titleText = hasName ? mapName : $"Level {(Scene as PlayScene).levelID}";
+            var titleUI = new Label(titleText, gameSkin)
+                .SetWrap(false)
                 .Center()
-                .Top();
+                ;
+            topUI.Add(titleUI).SetFillX();
+                ;
+
+            //Animate title label UI
             Core.Schedule(1.75f, false, null, timer =>
             {
                 var duration = 1.6f;
-                Core.StartCoroutine(AnimateElementY(title, title.GetY(), -title.GetHeight(), duration));
+                Core.StartCoroutine(AnimateElementY(titleUI, titleUI.GetY(), -titleUI.GetHeight()-topUI.GetPadTop(), duration));
             });
 
-            //var pauseWindow = CreatePauseMenu(skin);
-            table.Add(new TextButton("<", skin).AddLeftMouseListener((btt) => PauseGame()))
+            //pause button
+            pauseBtt = new IconButton(gameSkin);
+            pauseBtt.ProgrammaticChangeEvents = true;
+            pauseBtt.OnChanged += isCheck =>
+            {
+                pauseBtt.ProgrammaticChangeEvents = false;
+                TogglePause(isCheck);
+                pauseBtt.ProgrammaticChangeEvents = true;
+            };
+
+            //Pause button cell
+            topUI.Add(pauseBtt)
+                .Size(Value.PercentWidth(2),Value.PercentHeight(2))
                 .SetExpandX()
-                .Size(butttonSize)
+                .Right()
+                .SetPadRight(5);
                 
                 ;
+        
+            //moveCount label
+            moveCountLabel = new Label("MoveCount",gameSkin,ReUndoGame.TitleUI);
+            moveCountLabel.FillParent = true;
+            moveCountLabel.Bottom().MoveBy(0,-5) ;
 
-            _ui.Stage.AddElement(table);
+            uiCanvas.Stage.AddElement(moveCountLabel);
+            uiCanvas.Stage.AddElement(topUI); 
+            #endregion
+
+            
+            pauseWindow = CreatePauseMenu(ReUndoGame.GameSkin, ReUndoGame.PlayScenePauseUI)
             ;
         }
-    }
 
-    public void ResumeGame()
-    {
-        _inputManager.SetEnable(true);
+        //Initialise move count number
+        ///Reauire Score Label initialized
+        if (_map != null && _map.Properties.TryGetValue("move_count", out string moveCntStr))
+            SetMoveCount(int.Parse(moveCntStr));
+        else
+            SetMoveCount(_moveCount);
+
+        _inputManager.OnEsc     += () =>
+        {
+            if (!IsGamePaused)
+                PauseGame();
+            else GotoLevelSelector();
+        };
+        _inputManager.OnUndo    += () => UndoCommand();
+        _inputManager.OnRedo    += () => RedoCommand();
+        
+        _inputManager.OnRestart += RestartGame;
+
+        OnExecute   += () => SetMoveCount(_moveCount - 1); //decrese movecount and disable input when move count reach zero
+        OnExecute   += () => Raylib.PlaySound(ContentManager.Get<Sound>("sfx-walk"));
+        OnExecute   += CheckWinCondition;
+        OnUndo      += () => Raylib.PlaySound(ContentManager.Get<Sound>("sfx-undo"));
+        OnUndo      += CheckWinCondition;
+        OnRedo   += () => Raylib.PlaySound(ContentManager.Get<Sound>("sfx-redo"));
+        OnRedo      += CheckWinCondition;
     }
-    public void PauseGame()
-    {
-        _inputManager.SetEnable(false);
-        ShowWindow(CreatePauseMenu(UndoGame.GameSkin, UndoGame.PauseUI), _ui.Stage);
-    }
-    public override void OnRemovedFromEntity()
+    public override void  OnRemovedFromEntity()
     {
         //var cm = Core.Instance.Managers.Find(m => m is CoroutineManager) as CoroutineManager;
         //cm.TogglePauseAll(true);
     }
+
+    #region UI Utils
     IEnumerator AnimateElementY(Element element, float start, float offset, float duration)
     {
         float elapse = 0;
@@ -171,7 +242,7 @@ public class GameMananger : Component,ICustomInspectorImgui
         }
         element.SetY(start + offset);
     }
-    void ShowWindow(Window window,Stage stage)
+    void ShowWindow(Window window, Stage stage)
     {
         stage.AddElement(window);
         window.Pack();
@@ -183,105 +254,207 @@ public class GameMananger : Component,ICustomInspectorImgui
         var h = MathF.Round((stage.GetHeight() - height) / 2);
         window.SetPosition(w, h);
     }
-    Window CreatePauseMenu(Skin skin,string style)
+    Window CreatePauseMenu(Skin skin, string style)
     {
-        float padTop = 10f;
-        float buttonPadding = 2f;
+        float buttonThrshold = 0;
 
-        Window window = new Window("PAUSE",skin,style);
-        window.GetTitleTable().PadLeft(10).PadBottom(10);
-        window.SetMovable(false) ;
-        window.SetResizable(false) ;
+        float titlePadBot = 10;
+        float titlePadLeft = 10;
 
-        window.Pad(5);
-        Table optionsSection = new Table();
-        Table bottomSection = new Table();
+        float windowPadTop = 10f;
 
-        window.Add(optionsSection);
+        float buttonsPadding = 1f;
+        float buttonMinWidthPercent = 1.2f;
+        Window window = new Window("PAUSE", skin, style)
+            .SetMovable(false)
+            .SetResizable(false)
+            ;
+        window.GetTitleTable().PadLeft(titlePadLeft).PadBottom(titlePadBot);
+        window.Pad(4);
 
-        ///Resume button
-        var resumeBtt = new TextButton("Resume",skin, style);
+        #region Options Widget
+
+        Table optionsWidget = new Table()
+            .PadTop(windowPadTop);
+
+        window.Add(optionsWidget);
+
+        /// 1st row
+        #region Resume Button
+        //Element
+        var resumeBtt = CreateOptionButton("Resume", skin, style);
         resumeBtt.OnClicked += (b) =>
         {
             ResumeGame();
-            window.Remove();
+            b.VerifyState();
         };
 
-        /// Add 
-        optionsSection.Add(resumeBtt)
-            .SetPadTop(padTop)
-            .SetPadBottom(buttonPadding)
-            .SetFillX();
-        optionsSection.Row();
-        optionsSection.Add(bottomSection);
+        //Cell
+        optionsWidget.Add(resumeBtt)
+            .SetMinWidth(Value.PercentWidth(buttonMinWidthPercent))
+            .Pad(buttonsPadding)
+            .SetColspan(2)
+            .GrowX()
+            ;
+        #endregion Resume Button
 
+        optionsWidget.Row();
+        /// 2nd row
 
-        ///Bottom Section
-        ///Setting Button 
-        var settingBtt = new TextButton("Setting", skin, style);
-        settingBtt.OnClicked += (b) => Console.WriteLine("working on it"); ;
-        bottomSection.Add(settingBtt)
-            .Width(Value.PercentWidth(1.2f))
-            .SetPadRight(buttonPadding);
+        #region Setting Button
+        //Element
+        var settingBtt = CreateOptionButton("setting",skin,style);
+        settingBtt.OnClicked += (b) =>
+        {
+            var window = new Window("", skin,style);
 
-        ///Back Button
-        var backBtt = new TextButton("Back", skin, style);
-        backBtt.OnClicked += (b) => GotoLevelSelector();
-        bottomSection.Add(backBtt)
-            .Width(Value.PercentWidth(1.2f));
+            b.GetStage().AddElement(window);
+            window.SetFillParent(true);
 
+            window.Add(ReUndoGame.SettingWidget)
+                .Pad(0);
+            window.Row(); 
+            window.Add(new TextButton("back", skin)).Center().SetPadBottom(20)
+            .GetElement<TextButton>().AddLeftMouseListener(btt=> {
+                window.Remove();
+                b.VerifyState();
+
+            });
+
+        };
+
+        //Cell
+        optionsWidget.Add(settingBtt)
+            .SetMinWidth(Value.PercentWidth(buttonMinWidthPercent))
+            .Pad(buttonsPadding)
+            .SetColspan(2)
+            .GrowX()
+            ; 
+        #endregion
+
+        optionsWidget.Row();
+        /// 3rd row
+
+        #region Restart Button
+
+        //Element
+        var restartBtt = CreateOptionButton("Restart (R)", skin, style);
+        restartBtt.OnClicked += (b) => RestartGame();
+
+        //Cell
+        optionsWidget.Add(restartBtt)
+            .SetMinWidth(Value.PercentWidth(buttonMinWidthPercent))
+            .Pad(buttonsPadding)
+            ;
+
+        #endregion Restart Button
+
+        #region Back Button
+        //Element
+        var backBtt = CreateOptionButton("Back", skin, style);
+        backBtt.OnClicked += (b) =>
+        {
+            Raylib.PlaySound(ContentManager.Get<Sound>("sfx-click"));
+            GotoLevelSelector();
+        };
+
+        //Cell
+        optionsWidget.Add(backBtt)
+            .SetMinWidth(Value.PercentWidth(buttonMinWidthPercent))
+            .Pad(buttonsPadding)
+            ; 
+        #endregion
+
+        #endregion Options Widget
 
         return window;
-        
-    }
 
-    /// <summary>
-    /// Event Called from Character
-    /// </summary>
-    /// <param name="MovedEntity"></param>
-    public void OnCharacterMoved(Entity MovedEntity)
+    } 
+
+    TextButton CreateOptionButton(string text,Skin skin, string style)
     {
-#if true
-        var location = MovedEntity.GetComponent<GridObject>().GetLocation();
-        var cell = grid.GetCell(location);
+        var btt = new TextButton(text, skin, style);
+        btt.ButtonBoundaryThreshold = 0;
+        btt.OnHovered += (isOver) =>
+        {
+            if (isOver) Raylib.PlaySound(ContentManager.Get<Sound>("sfx-hover"));
+        };
 
-        var indicators = from o in cell.Objects where
-                         o.Entity.HasComponent<Indicator>() && 
-                         o.Entity.GetComponent<Character>().Layer == PlayScene.INDICATOR_CHRACTER_LAYER 
-                         select o.Entity.GetComponent<Indicator>();
-
-
-        if (indicators.Any(i => i.IsIndicated()))
-            CheckAllIndicators();
-#endif
+        return btt;
     }
+    #endregion
 
     #region Utilities
-    public void CheckAllIndicators()
+    public void TogglePause(bool pause)
     {
-        if (indicators.All(i => i.IsIndicated()))
+        Console.WriteLine(pause);
+            if (pause) PauseGame();
+            else ResumeGame();
+    }
+    void ResumeGame()
+    {
+        Raylib.PlaySound(ContentManager.Get<Sound>("sfx-forward"));
+        pauseWindow.Remove();
+
+        pauseBtt.IsChecked = false;
+        _inputManager.AllowCommand = _inputManager.AllowControl = !pauseBtt.IsChecked;
+
+    }
+    void PauseGame()
+    {
+        Raylib.PlaySound(ContentManager.Get<Sound>("sfx-back"));
+        ShowWindow(pauseWindow, uiCanvas.Stage);
+
+        pauseBtt.IsChecked = true;
+        _inputManager.AllowCommand = _inputManager.AllowControl = !pauseBtt.IsChecked;
+
+
+    }
+    void OnWinGame()
+    {
+        Raylib.PlaySound(ContentManager.Get<Sound>("sfx-click_play"));
+        Core.Schedule(0.3f, false, null, timer =>
         {
-            Console.WriteLine("you win");
-            var nextLevelID = (Scene as PlayScene).levelID + 1;
-            if (UndoGame.LevelsDictionary.TryGetValue(nextLevelID, out _))
+            var scene = (Scene as PlayScene);
+            var nextLevelID = scene.levelID + 1;
+            if (ReUndoGame.LevelsDictionary.TryGetValue(nextLevelID, out _))
             {
-                if (Scene.TryFindComponent<InputManager>(out var inputManager))
+                if (Scene.TryFindComponent<PlaySceneInputManager>(out var inputManager))
                     inputManager.SetEnable(false);
                 GoToLevel(nextLevelID);
             }
-            else
-                GotoLevelSelector();
+            else GotoLevelSelector();
+
+            ///Set properties
+            ReUndoGame.LevelsDictionary[nextLevelID].AllowReplay = true;
+        });
+    }
+    public void RestartGame()
+    {
+        Raylib.PlaySound(ContentManager.Get<Sound>("sfx-click"));
+        GoToLevel((this.Scene as PlayScene).levelID);
+    }
+    public void CheckWinCondition()
+    {
+        if (indicators.All(i => i.IsIndicated())) // Win
+        {
+            OnWinGame();
+
         }
-        else
+        else /// Not win yet
         {
             var undones = indicators.Where(i => !i.IsIndicated());
             Console.WriteLine($"{undones.Count()} still missing");
         }
     }
     public void GoToLevel(int levelID)
-        => Core.StartTransition(new FadeTransition(() => new PlayScene(levelID)));
+    {
+        Core.StartTransition(new SwipeTransition(() => new PlayScene(levelID)));
+    }
     public void GotoLevelSelector()
-        => Core.StartTransition(new FadeTransition(() => new LevelSelectorScene())); 
+    {
+        Core.StartTransition(new SwipeTransition(() => new LevelSelectorScene())); 
+    }
     #endregion
 
     #region Command System
@@ -301,7 +474,7 @@ public class GameMananger : Component,ICustomInspectorImgui
                 var character = movement.Key;
                 var delta = movement.Value;
 
-                character.MoveRecursive(delta.X, delta.Y, false);
+                character.RelocateRecursive(delta.X, delta.Y, false);
 
             }
         }
@@ -313,7 +486,7 @@ public class GameMananger : Component,ICustomInspectorImgui
                 var character = movement.Key;
                 var delta = movement.Value;
 
-                character.MoveRecursive(delta.X, delta.Y, false);
+                character.RelocateRecursive(delta.X, delta.Y, false);
 
             }
         }
@@ -326,7 +499,7 @@ public class GameMananger : Component,ICustomInspectorImgui
                 var character = movement.Key;
                 var delta = -movement.Value;
 
-                character.MoveRecursive(delta.X, delta.Y, false);
+                character.RelocateRecursive(delta.X, delta.Y, false);
 
             }
         }
@@ -343,7 +516,9 @@ public class GameMananger : Component,ICustomInspectorImgui
         }
     }
     List<KeyValuePair<Character, VectorInt2>> characterMovements = new();
+    private Label moveCountLabel;
 
+    public event Action? OnExecute, OnUndo, OnRedo;
     public void RequestMovement(Character character, VectorInt2 movement)
     {
         characterMovements.Add(new(character, movement));
@@ -354,23 +529,30 @@ public class GameMananger : Component,ICustomInspectorImgui
         {
             cmd.ExecuteCommand(new CharactersMoveCommand(new(characterMovements)));
             characterMovements.Clear();
+            OnExecute?.Invoke();
         }
     }
     public void UndoCommand()
     {
         if (this.Entity.TryGetComponent(out CommandSystem cmd))
         {
-            cmd.SendUndoCommand();
-            characterMovements.Clear();
-
+            if (cmd.SendUndoCommand())
+            {
+                characterMovements.Clear();
+                OnUndo?.Invoke();
+            }
+            
         }
     }
     public void RedoCommand()
     {
         if (this.Entity.TryGetComponent(out CommandSystem cmd))
         {
-            cmd.SendRedoCommand();
-            characterMovements.Clear();
+            if (cmd.SendRedoCommand())
+            {
+                characterMovements.Clear();
+                OnRedo?.Invoke();
+            }
         }
     }
 
@@ -379,21 +561,37 @@ public class GameMananger : Component,ICustomInspectorImgui
     {
         if(ImGuiNET.ImGui.Button("Reset Scene") )
         {
-            var transition = new FadeTransition(() => new PlayScene(0));
-            transition.FadeInDuration = transition.FadeOutDuration = 0.1f;
+            var transition = new SwipeTransition(() => new PlayScene(0));
+            transition.EnterDuration = transition.ExitDuration = 0.1f;
             transition.HoldDuration = 1f;
             Core.StartTransition(transition);
         }
 
-        foreach (var resource in ContentManager.Instance.Resources)
+        foreach (var sub in ContentManager.Instance.Resources)
         {
-            ImGui.Text(resource.Key);
-            foreach (var content in resource.Value)
+            ImGui.Text(sub.Key.ToString());
+            foreach (var content in sub.Value)
             {
                 ImGui.Text($"{content.Key} : {content.Value}");
             }
             ImGui.Separator();
         }
+        ImGui.SliderInt("moveocunt",ref _moveCount,0,10);
     }
 
+    /// <summary>
+    /// Event Called from Character
+    /// </summary>
+    /// <param name="MovedEntity"></param>
+    public void OnSingleCharacterMoved(int locX,int locY)
+    {
+        var cell = grid.GetCell(locX,locY);
+
+        var indicators = from o in cell.Objects where
+                         o.Entity.HasComponent<Indicator>() && 
+                         o.Entity.GetComponent<Character>().Layer == PlayScene.INDICATOR_CHRACTER_LAYER 
+                         select o.Entity.GetComponent<Indicator>();
+
+
+    }
 }

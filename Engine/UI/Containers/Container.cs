@@ -26,7 +26,7 @@ namespace Engine.UI
 		#endregion
 
 
-		Element _element;
+		Element? _element;
 		Value _minWidthValue = Value.MinWidth, _minHeightValue = Value.MinHeight;
 		Value _prefWidthValue = Value.PrefWidth, _prefHeightValue = Value.PrefHeight;
 		Value _maxWidthValue = Value.Zero, _maxHeightValue = Value.Zero;
@@ -236,7 +236,7 @@ namespace Engine.UI
 		/// May be null
 		/// </summary>
 		/// <returns>The element.</returns>
-		public T GetElement<T>() where T : Element
+		public T? GetElement<T>() where T : Element
 		{
 			return _element as T;
 		}
@@ -246,7 +246,7 @@ namespace Engine.UI
 		/// May be null
 		/// </summary>
 		/// <returns>The element.</returns>
-		public Element GetElement()
+		public Element? GetElement()
 		{
 			return _element;
 		}

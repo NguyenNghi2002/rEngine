@@ -156,6 +156,11 @@ namespace Engine
             return component;
         }
 
+        public T AddComponent<T>(out T componentOut) where T : Component,new()
+        {
+            componentOut = AddComponent<T>();
+            return componentOut;
+        }
         public T AddComponent<T>(T component,out T componentOut) where T : Component
         {
             HandleAddComponent(component);

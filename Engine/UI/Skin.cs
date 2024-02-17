@@ -25,6 +25,7 @@ namespace Engine.UI
             var buttonColor = new Color(78, 91, 98, 255);
             var buttonOver = new Color(168, 207, 115, 255);
             var buttonDown = new Color(244, 23, 135, 255);
+            var buttonDisable = new Color(46, 54, 58, 255);
             var overFontColor = new Color(85, 127, 27, 255);
             var downFontColor = new Color(255, 255, 255, 255);
             var checkedOverFontColor = new Color(247, 217, 222, 255);
@@ -69,6 +70,7 @@ namespace Engine.UI
                 Up = new PrimitiveDrawable(buttonColor),
                 Over = new PrimitiveDrawable(buttonOver),
                 Down = new PrimitiveDrawable(buttonDown),
+                Disabled = new PrimitiveDrawable(buttonDisable),
                 OverFontColor = overFontColor,
                 DownFontColor = downFontColor,
                 PressedOffsetX = 0,

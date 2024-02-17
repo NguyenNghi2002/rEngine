@@ -27,6 +27,7 @@ namespace Engine.UI
 
 		public T InsertElement<T>(int index, T element) where T : Element
 		{
+			///Replace if there are already exist 
 			if (element.parent != null)
 				element.parent.RemoveElement(element);
 
@@ -129,8 +130,12 @@ namespace Engine.UI
 			InvalidateHierarchy();
 		}
 
-		
 
+		/// <summary>
+		/// Return point hover on <see cref="Element"/> inside <see cref="Group"/>, other otherwise return <see langword="null"/> 
+		/// </summary>
+		/// <param name="point"></param>
+		/// <returns></returns>
 		public override Element Hit(Vector2 point)
 		{
 			if (touchable == Touchable.Disabled)
